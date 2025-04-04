@@ -10,8 +10,14 @@ client.connect_signal('request::titlebars', function(c)
 		return
 	end
 
+	local minimize = button {
+		icon = 'minimize',
+	}
+	local maximize = button {
+		icon = 'expand-less',
+	}
 	local close = button {
-		icon = 'close'
+		icon = 'close',
 	}
 
 	local spacing = util.dpi(8)
@@ -26,28 +32,25 @@ client.connect_signal('request::titlebars', function(c)
 		{
 			layout = wibox.layout.align.horizontal,
 			{
-				widget = wibox.container.place,
-				{
 					layout = wibox.layout.fixed.horizontal,
 					spacing = spacing / 2,
-					{
-						widget = wibox.container.constraint,
-						strategy = 'exact',
-						width = util.dpi(22),
-						awful.titlebar.widget.iconwidget(c),
-					},
+					awful.titlebar.widget.iconwidget(c),
 					{
 						widget = awful.titlebar.widget.titlewidget(c),
 						font = beautiful.fontName .. ' Medium 12',
 					}
-				}
 			},
 			nil,
 			{
-				layout = wibox.layout.fixed.horizontal,
-				--minimize,
-				--maximize,
-				close
+				widget = wibox.container.constraint,
+				strategy = 'exact',
+				width = util.dpi((18 * 3) + (spacing * 2)),
+				{
+					layout = wibox.layout.fixed.horizontal,
+					minimize,
+					maximize,
+					close
+				}
 			}
 		}
 	}
