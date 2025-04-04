@@ -1,5 +1,6 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
+local gears = require 'gears'
 local wibox = require 'wibox'
 local util = require 'sys.util'
 local button = require 'ui.widget.button'
@@ -9,6 +10,17 @@ client.connect_signal('request::titlebars', function(c)
 	if c.requests_no_titlebar then
 		return
 	end
+
+	local buttons = gears.table.join(
+		awful.button({}, 1, function()
+			c:emit_signal('request::activate', 'titlebar', {raise = true})
+			awful.mouse.client.move(c)
+		end),
+		awful.button({}, 3, function()
+			c:emit_signal('request::activate', 'titlebar', {raise = true})
+			awful.mouse.client.resize(c)
+		end)
+	)
 
 	local minimize = button {
 		icon = 'minimize',
@@ -32,15 +44,19 @@ client.connect_signal('request::titlebars', function(c)
 		{
 			layout = wibox.layout.align.horizontal,
 			{
-					layout = wibox.layout.fixed.horizontal,
-					spacing = spacing / 2,
-					awful.titlebar.widget.iconwidget(c),
-					{
-						widget = awful.titlebar.widget.titlewidget(c),
-						font = beautiful.fontName .. ' Medium 12',
-					}
+				layout = wibox.layout.fixed.horizontal,
+				buttons = buttons,
+				spacing = spacing / 2,
+				awful.titlebar.widget.iconwidget(c),
+				{
+					widget = awful.titlebar.widget.titlewidget(c),
+					font = beautiful.fontName .. ' Medium 12',
+				}
 			},
-			nil,
+			{
+				buttons = buttons,
+				layout = wibox.container.place
+			},
 			{
 				widget = wibox.container.constraint,
 				strategy = 'exact',
