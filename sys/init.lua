@@ -40,6 +40,9 @@ settings.defineType('bars', {
 	}
 })
 
+require 'sys.theme'
+require 'sys.boot'
+
 local command = require 'sys.command'
 command.defaults()
 

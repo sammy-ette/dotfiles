@@ -1,7 +1,7 @@
 local beautiful = require 'beautiful'
 local gears = require 'gears'
 local settings = require 'sys.settings'
-local palettes = require 'ui.theme.palettes'
+local palettes = require 'sys.theme.palettes'
 local util = require 'sys.util'
 
 local themeSettings = settings.getConfig 'theme'

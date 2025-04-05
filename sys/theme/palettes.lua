@@ -1,5 +1,5 @@
 local themes = {
-	['harmony'] = require 'ui.theme.harmony'
+	['harmony'] = require 'sys.theme.harmony'
 }
 
 local M = {}

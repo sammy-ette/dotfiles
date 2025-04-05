@@ -16,6 +16,7 @@ for idx, barSetup in ipairs(bars) do
 		local widgets = {}
 		local startMenuActivator = icon {
 			icon = 'fedora',
+			size = util.dpi(barSetup.height),
 			color = beautiful.accent
 		}
 		startMenuActivator.buttons = {
@@ -94,10 +95,15 @@ for idx, barSetup in ipairs(bars) do
 				margins = {
 					--top = barSetup.position == 'bottom' and beautiful.useless_gap
 				},
+				visible = false
 				--restrict_workarea = false
 			}
 			s.bar[idx] = bar
 			bar:setup(createBarWidget(idx))
+
+			awesome.connect_signal('paperbush::initialized', function()
+				bar.visible = true
+			end)
 
 			if barSetup.autohide then
 				local hideHeight = bar.y + bar.height

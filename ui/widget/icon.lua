@@ -2,7 +2,6 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 local gtable = require 'gears.table'
 local makeup = require 'ui.makeup'
-local helpers = require 'helpers'
 local util = require 'sys.util'
 
 local constraint = require 'wibox.container.constraint'
@@ -37,13 +36,6 @@ function icon:set_makeup(v)
 end
 
 function icon:set_size(size)
-	self.height = size
-	self.width = size
-end
-
-function icon:fit(ctx, w, h)
-	local m = math.min(w, h)
-	return m
 end
 
 local function new(ico, args)
@@ -55,7 +47,7 @@ local function new(ico, args)
 	args.size = args.size or util.dpi(18)
 
 	local ib = imagebox()
-	local ret = place(ib)
+	local ret = constraint(place(ib), 'exact', args.size, args.size)
 	gtable.crush(ret, icon, true)
 
 	ret._private.imagebox = ib
