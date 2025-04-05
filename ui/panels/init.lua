@@ -17,20 +17,16 @@ function M.create(args)
 	--local panel = M.wibox(args)
 	--panel:setup(args.widget)
 	--TODO: handle margins and positions properly for bars on left/right
+	args.attach = args.attach or 'mouse'
 	local panel = wibox {
 		shape = args.shape or util.rrect(args.radius),
 		ontop = true,
 		visible = false,
 		bg = args.bg or beautiful.panelBackground,
-		widget = {
-			layout = wibox.container.place,
-			forced_height = args.height,
-			forced_width = args.width,
-			args.widget
-		},
+		widget = args.widget,
 		height = args.height,
 		width = args.width,
-		open = false
+		open = false,
 	}
 
 	panel:struts {
@@ -38,7 +34,7 @@ function M.create(args)
 		left = beautiful.useless_gap, right = beautiful.useless_gap,
 	}
 
-	function panel:toggle(barIdx)
+	function panel:align(barIdx)
 		local scr = awful.screen.focused()
 		local function locateQuadrant(x, y)
 			local isTop = y < (scr.geometry.height / 2)
@@ -49,8 +45,14 @@ function M.create(args)
 			return vertAlign .. '_' .. horizAlign, vertAlign, horizAlign
 		end
 
-		local mc = mouse.coords()
-		local alignment, vert = locateQuadrant(mc.x, mc.y)
+		local alignment, vert
+		if args.attach == 'mouse' then
+			local mc = mouse.coords()
+			alignment, vert = locateQuadrant(mc.x, mc.y)
+		else
+			alignment = args.attach
+			vert = args.attach:match '([%w]+)_'
+		end
 		awful.placement.align(panel, {
 			position = alignment,
 			margins = {
@@ -62,37 +64,71 @@ function M.create(args)
 		})
 
 		local buffer = barIdx and scr.bar[barIdx].height or 0
-		local hideHeight = scr.geometry.height
-		local revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
-		local animator = rubato.timed {
+		--local hideHeight, revealHeight
+		if vert == 'top' then
+			panel.hideHeight = -args.height
+			panel.revealHeight = beautiful.useless_gap + buffer
+			print 'vert top'
+		elseif vert == 'bottom' then
+			print 'vert bottom'
+			panel.hideHeight = scr.geometry.height
+			panel.revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
+		end
+
+		print(panel.revealHeight)
+
+		if vert == 'bottom' and panel.open then
+			panel.y = panel.hideHeight
+		end
+	end
+
+	function panel:animator(barIdx)
+		return rubato.timed {
 			duration = 0.25,
 			rate = 120,
 			override_dt = true,
 			subscribed = function(y)
 				panel.y = y
-				if y == hideHeight then
+				if y == panel.hideHeight then
 					panel.visible = false
 				end
 			end,
-			pos = not panel.open and hideHeight or revealHeight
+			pos = panel.open and panel.hideHeight or panel.revealHeight
 		}
+	end
 
-		if vert == 'bottom' and panel.open then
-			panel.y = hideHeight
-		end
-
+	function panel:toggle(barIdx)
 		panel.open = not panel.open
 		if panel.open then
-			if panel.manage then
-				panel:manage(panel.open)
-			end
-			animator.target = revealHeight
-			panel.visible = true
+			panel:on(barIdx)
 		else
-			animator.target = hideHeight
+			panel:off(barIdx)
+		end
+	end
+
+	function panel:on(barIdx)
+		local openBefore = panel.open
+		panel.open = true
+		if not openBefore then
+			panel:align(barIdx)
+			local animator = panel:animator()
+			print 'opening'
 			if panel.manage then
 				panel:manage(panel.open)
 			end
+			animator.target = panel.revealHeight
+			panel.visible = true
+		end
+	end
+
+	function panel:off(barIdx)
+		panel.open = false
+		panel:align(barIdx)
+		local animator = panel:animator()
+		print 'closing'
+		animator.target = panel.hideHeight
+		if panel.manage then
+			panel:manage(panel.open)
 		end
 	end
 

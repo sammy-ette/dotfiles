@@ -21,7 +21,7 @@ local function emit_volume_info(init)
             -- through `pavucontrol` or even without user intervention,
             -- when a media file starts playing.
             if volume_int ~= volume_old or muted ~= muted_old then
-                awesome.emit_signal('syntax::volume', volume_int, muted, init)
+                awesome.emit_signal('sys::volume', volume_int, muted, init)
                 volume_old = volume_int
                 muted_old = muted
             end
