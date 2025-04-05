@@ -98,38 +98,36 @@ function M.create(args)
 	end
 
 	function panel:toggle(barIdx)
-		panel.open = not panel.open
 		if panel.open then
-			panel:on(barIdx)
-		else
 			panel:off(barIdx)
+		else
+			panel:on(barIdx)
 		end
 	end
 
 	function panel:on(barIdx)
-		local openBefore = panel.open
 		panel.open = true
-		if not openBefore then
-			panel:align(barIdx)
-			local animator = panel:animator()
-			print 'opening'
-			if panel.manage then
-				panel:manage(panel.open)
-			end
-			animator.target = panel.revealHeight
-			panel.visible = true
+		panel:align(barIdx)
+
+		if panel.manage then
+			panel:manage(panel.open)
 		end
+
+		local animator = panel:animator()
+		animator.target = panel.revealHeight
+		panel.visible = true
 	end
 
 	function panel:off(barIdx)
 		panel.open = false
 		panel:align(barIdx)
-		local animator = panel:animator()
-		print 'closing'
-		animator.target = panel.hideHeight
+
 		if panel.manage then
 			panel:manage(panel.open)
 		end
+
+		local animator = panel:animator()
+		animator.target = panel.hideHeight
 	end
 
 	return panel

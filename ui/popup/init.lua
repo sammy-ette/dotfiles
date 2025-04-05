@@ -11,6 +11,7 @@ local M = {}
 function M.create(opts)
 	local iconWidget = icon {
 		icon = opts.icon,
+		color = beautiful.foregroundSecondary
 	}
 
 	local popup = panels.create {
@@ -58,7 +59,9 @@ function M.create(opts)
 		if popup.open then
 			displayTimer:stop()
 		end
-		oldOn(popup)
+		if not popup.open then
+			oldOn(popup)
+		end
 		displayTimer:start()
 	end
 
