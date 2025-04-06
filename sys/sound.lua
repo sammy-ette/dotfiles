@@ -1,5 +1,6 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
+local gfs = require 'gears.filesystem'
 local step = 5
 local sounds = {
 	notification = 'notify6.wav',
