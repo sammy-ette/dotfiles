@@ -16,7 +16,7 @@ beautiful.init(gears.table.crush({
 	font = fontName .. ' Regular 12',
 
 	titlebarHeight = 48,
-	titlebarBackground = palette.shade2,
+	titlebarBackground = palette.shade1,
 	radius = 6,
 
 	barBackground = palette.background,
