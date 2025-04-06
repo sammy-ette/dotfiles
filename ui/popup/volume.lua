@@ -17,7 +17,7 @@ local volumeMeter = wibox.widget {
 }
 local volumeText = wibox.widget {
 	widget = textbox,
-	color = beautiful.foregroundSecondary,
+	color = beautiful.foreground,
 }
 
 local volume = popup.create {
