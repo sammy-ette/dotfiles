@@ -3,10 +3,13 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 local naughty = require 'naughty'
-local util = require 'sys.util'
-local sound = require 'sys.sound'
 
 local icon = require 'ui.widget.icon'
+local panels = require 'ui.panels'
+local rubato = require 'libs.rubato'
+local sound = require 'sys.sound'
+local util = require 'sys.util'
+local textbox = require 'ui.widget.textbox'
 
 local categoryMappings = {
 	['drive-removable-media'] = 'usb',
@@ -21,6 +24,127 @@ local skip = {
 local function categoryToIcon(cat)
 	local mapping = categoryMappings[cat]
 	return mapping or cat
+end
+
+local briefTimeout = 3.5
+local briefInitSize = util.dpi(32)
+local scr = awful.screen.focused()
+local briefNotifMaxSize = scr.geometry.width / 4
+local briefNotifFullSize = briefInitSize
+
+local briefIcon = icon {
+	color = beautiful.panelBackground,
+	size = briefInitSize,
+}
+
+local briefTitle = wibox.widget {
+	widget = textbox,
+	font = beautiful.fontName .. ' Bold',
+	text = '',
+	opacity = 0,
+	id = 'title'
+}
+local briefMessage = wibox.widget {
+	widget = textbox,
+	ellipsize = 'middle',
+	text = '',
+	opacity = 0,
+	id = 'message'
+}
+
+local briefMargins = util.dpi(5)
+local briefSpacing = util.dpi(6)
+local briefNotif = panels.create {
+	shape = gears.shape.rounded_bar,
+	fakeShape = util.rrect(14),
+	width = briefInitSize,
+	height = briefInitSize,
+	widget = {
+		widget = wibox.container.margin,
+		--margins = util.dpi(6),
+		id = 'margins',
+		{
+			layout = wibox.container.place,
+			halign = 'left',
+			valign = 'center',
+			{
+				layout = wibox.layout.fixed.horizontal,
+				--spacing = -briefSpacing / 2,
+				{
+					layout = wibox.container.background,
+					bg = beautiful.accent,
+					shape = gears.shape.circle,
+					{
+						widget = wibox.container.margin,
+						margins = util.dpi(2),
+						briefIcon
+					}
+				},
+				{
+					layout = wibox.layout.fixed.horizontal,
+					spacing = briefSpacing,
+					{
+						widget = wibox.container.constraint,
+						width = briefNotifMaxSize / 2.5,
+						briefTitle
+					},
+					briefMessage
+				}
+			}
+		}
+	},
+	attach = 'top'
+}
+local briefMargin = briefNotif.widget:get_children_by_id 'margins'[1]
+local briefNotifAnimator = rubato.timed {
+	duration = 0.5,
+	rate = 120,
+	override_dt = true,
+	subscribed = function(w)
+		local scale = (math.max(0, w - briefInitSize)/math.max(1, briefNotifFullSize - briefInitSize))
+		briefNotif.width = w
+		briefMargin.margins = briefMargins * scale
+		briefTitle.opacity = scale
+		briefMessage.opacity = scale
+		briefNotif:align(nil, true)
+	end,
+	pos = briefInitSize,
+	easing = rubato.easing.quadratic
+}
+
+function briefNotif:revealed()
+	local briefTitleW = briefTitle:get_preferred_size(awful.screen.focused().index)
+	local briefMessageW = briefMessage:get_preferred_size(awful.screen.focused().index)
+
+	local briefNotifPreferredSize = briefMargins + briefInitSize + briefSpacing + briefTitleW + briefSpacing + briefMessageW + briefSpacing + briefMargins
+	briefNotifFullSize = math.min(briefNotifMaxSize, briefNotifPreferredSize)
+	briefNotifAnimator.target = briefNotifFullSize
+end
+
+local fullHideTimer = gears.timer {
+	timeout = briefTimeout + 0.5,
+	single_shot = true,
+	callback = function()
+		briefNotif:off()
+	end
+}
+local displayTimer = gears.timer {
+	timeout = briefTimeout,
+	single_shot = true,
+	callback = function()
+		briefNotifAnimator.target = briefInitSize
+	end
+}
+
+local function briefNotify()
+	if displayTimer.started then
+		displayTimer:stop()
+		fullHideTimer:stop()
+	end
+
+	displayTimer:start()
+	fullHideTimer:start()
+	briefNotif:on()
 end
 
 naughty.connect_signal('request::display', function(notification)
@@ -77,9 +201,19 @@ naughty.connect_signal('request::display', function(notification)
 	end
 	]]--
 
-	if true then
-		
-		--return
+	local fullscreenClient = false
+	for _, c in ipairs(awful.screen.focused().selected_tag:clients()) do
+		if c.fullscreen then
+			fullscreenClient = true
+		end
+	end
+
+	if fullscreenClient then
+		briefIcon.icon = category or 'notification'
+		briefTitle.text = notification.title
+		briefMessage.text = notification.text
+		briefNotify()
+		return
 	end
 
 	naughty.layout.box {

@@ -31,6 +31,11 @@ function icon:set_color(color)
 	self._private.imagebox:emit_signal 'widget::redraw_needed'
 end
 
+function icon:set_shape(shape)
+	if shape then
+		self._private.imagebox.clip_shape = shape
+	end
+end
 function icon:set_makeup(v)
 	self._private.makeup = v
 end
@@ -53,6 +58,7 @@ local function new(ico, args)
 	ret._private.imagebox = ib
 
 	ret:set_icon(args.icon)
+	ret:set_shape(args.shape)
 	ret:set_color(args.color or 'foreground')
 
 	awesome.connect_signal('makeup::put_on', function() ret:set_color(ret._private.makeup or ret._private.color) end)

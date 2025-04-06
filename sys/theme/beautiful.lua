@@ -20,7 +20,7 @@ beautiful.init(gears.table.crush({
 	radius = 6,
 
 	barBackground = palette.background,
-	panelBackground = palette.background,
+	panelBackground = palette.backgroundSecondary,
 	
 	useless_gap = util.dpi(6),
 

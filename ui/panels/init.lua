@@ -19,23 +19,27 @@ function M.create(args)
 	--TODO: handle margins and positions properly for bars on left/right
 	args.attach = args.attach or 'mouse'
 	local panel = wibox {
-		shape = args.shape or util.rrect(args.radius),
+		shape = args.fakeShape or util.rrect(args.radius or beautiful.radius),
 		ontop = true,
 		visible = false,
-		bg = args.bg or beautiful.panelBackground,
-		widget = args.widget,
+		--bg = args.bg or beautiful.panelBackground,
+		bg = '#00000000',
+		widget = wibox.widget {
+			layout = wibox.container.background,
+			bg = args.bg or beautiful.panelBackground,
+			shape = args.shape or util.rrect(args.radius),
+			args.widget
+		},
 		height = args.height,
 		width = args.width,
 		open = false,
 	}
 
-	panel:struts {
-		top = beautiful.useless_gap, bottom = beautiful.useless_gap,
-		left = beautiful.useless_gap, right = beautiful.useless_gap,
-	}
-
-	function panel:align(barIdx)
-		if panel.revealHeight then return end
+	function panel:align(barIdx, reposition)
+		if reposition then
+		elseif panel.revealHeight then
+			return
+		end
 
 		local scr = awful.screen.focused()
 		local function locateQuadrant(x, y)
@@ -53,13 +57,15 @@ function M.create(args)
 			alignment, vert = locateQuadrant(mc.x, mc.y)
 		else
 			alignment = args.attach
-			vert = args.attach:match '([%w]+)_'
+			vert = args.attach:match '([%w]+)'
 		end
 		awful.placement.align(panel, {
 			position = alignment,
 			margins = {
 				left = beautiful.useless_gap,
 				right = beautiful.useless_gap,
+				top = beautiful.useless_gap,
+				bottom = beautiful.useless_gap
 			},
 			--honor_workarea = true,
 			--honor_padding = true
@@ -70,14 +76,11 @@ function M.create(args)
 		if vert == 'top' then
 			panel.hideHeight = -args.height
 			panel.revealHeight = beautiful.useless_gap + buffer
-			print 'vert top'
 		elseif vert == 'bottom' then
-			print 'vert bottom'
 			panel.hideHeight = scr.geometry.height
 			panel.revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
 		end
 
-		print(panel.revealHeight)
 
 		if vert == 'bottom' and panel.open then
 			panel.y = panel.hideHeight
@@ -93,6 +96,10 @@ function M.create(args)
 				panel.y = y
 				if y == panel.hideHeight then
 					panel.visible = false
+				end
+
+				if panel.open and y == panel.revealHeight and panel.revealed then
+					panel:revealed()
 				end
 			end,
 			pos = panel.open and panel.hideHeight or panel.revealHeight
