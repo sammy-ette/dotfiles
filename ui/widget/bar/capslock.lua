@@ -12,7 +12,7 @@ local w = wibox.widget {
 	{
 		widget = wibox.container.background,
 		bg = util.invertColor(beautiful.background),
-		shape = gears.shape.rounded_bar,
+		shape = util.rrect(beautiful.radius),
 		{
 			widget = wibox.container.margin,
 			margins = util.dpi(6),
@@ -22,11 +22,13 @@ local w = wibox.widget {
 					icon = 'caps-on',
 					color = util.invertColor(beautiful.foreground)
 				},
+				--[[
 				{
 					widget = textbox,
 					color = util.invertColor(beautiful.foreground),
 					text = 'Caps is on'
 				}
+				]]
 			}
 		}
 	}
