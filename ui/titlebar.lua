@@ -40,7 +40,7 @@ client.connect_signal('request::titlebars', function(c)
 		end
 	}
 
-	local spacing = util.dpi(8)
+	local spacing = util.dpi(4)
 
 	awful.titlebar(c, {
 		height = util.dpi(beautiful.titlebarHeight),
@@ -54,8 +54,12 @@ client.connect_signal('request::titlebars', function(c)
 			{
 				layout = wibox.layout.fixed.horizontal,
 				buttons = buttons,
-				spacing = spacing / 2,
-				awful.titlebar.widget.iconwidget(c),
+				spacing = spacing,
+				{
+					layout = wibox.container.margin,
+					margins = util.dpi(6),
+					awful.titlebar.widget.iconwidget(c),
+				},
 				{
 					widget = awful.titlebar.widget.titlewidget(c),
 					font = beautiful.fontName .. ' Medium 12',
@@ -68,7 +72,7 @@ client.connect_signal('request::titlebars', function(c)
 			{
 				widget = wibox.container.constraint,
 				strategy = 'exact',
-				width = util.dpi((18 * 3) + (spacing * 2)),
+				--width = util.dpi((18 * 3) + (spacing * 2)),
 				{
 					layout = wibox.layout.fixed.horizontal,
 					minimize,

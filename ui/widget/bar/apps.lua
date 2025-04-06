@@ -40,7 +40,7 @@ return function(screen)
 		style = setmetatable({}, {
 			__index = function(_, k)
 				local styles = {
-					bg_normal = beautiful.shade1,
+					bg_normal = beautiful.shade3,
 					bg_focus = beautiful.accent,
 					bg_minimize = beautiful.shade1,
 					shape = util.rrect(6)
