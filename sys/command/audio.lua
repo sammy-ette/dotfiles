@@ -14,3 +14,10 @@ command.add {
 		sound.volumeUp()
 	end
 }
+
+command.add {
+	name = 'audio:mute-volume',
+	action = function()
+		sound.mute()
+	end
+}
