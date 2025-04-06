@@ -22,5 +22,8 @@ beautiful.init(gears.table.crush({
 	barBackground = palette.background,
 	panelBackground = palette.background,
 	
-	useless_gap = util.dpi(6)
+	useless_gap = util.dpi(6),
+
+	notificationWidth = util.dpi(340),
+	notificationHeight = util.dpi(120)
 }, palette))
