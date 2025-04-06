@@ -74,13 +74,12 @@ local opacityAnimator = rubato.timed {
 		splash.opacity = opacity
 		if opacity == 0 then
 			splash.visible = false
-			awesome.emit_signal('paperbush::initialized')
 		end
 	end,
 	pos = 1
 }
 
-awesome.connect_signal('paperbush::hideSplash', function()
+awesome.connect_signal('paperbush::initialized', function()
 	stop = true
 	opacityAnimator.target = 0
 end)
