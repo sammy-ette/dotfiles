@@ -35,6 +35,8 @@ function M.create(args)
 	}
 
 	function panel:align(barIdx)
+		if panel.revealHeight then return end
+
 		local scr = awful.screen.focused()
 		local function locateQuadrant(x, y)
 			local isTop = y < (scr.geometry.height / 2)
