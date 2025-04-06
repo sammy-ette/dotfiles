@@ -12,7 +12,7 @@ local cairo = require 'lgi'.cairo
 local bars = settings.getConfig 'bars'
 
 for idx, barSetup in ipairs(bars) do
-	local function moduleWidgets(position, barIdx)
+	local function moduleWidgets(position, barIdx, screen)
 		local widgets = {}
 		local startMenuActivator = icon {
 			icon = 'fedora',
@@ -28,7 +28,8 @@ for idx, barSetup in ipairs(bars) do
 		local moduleList = {
 			startMenu = startMenuActivator,
 			time = require 'ui.widget.bar.time',
-			capslock = require 'ui.widget.bar.capslock'
+			capslock = require 'ui.widget.bar.capslock',
+			apps = require 'ui.widget.bar.apps'(screen)
 		}
 		for _, moduleName in ipairs(barSetup.modules[position]) do
 			local module = moduleList[moduleName]
@@ -48,7 +49,7 @@ for idx, barSetup in ipairs(bars) do
 	end
 	
 
-	local function createBarWidget(idx)
+	local function createBarWidget(idx, screen)
 		return {
 			widget = wibox.container.background,
 			bg = beautiful.barBackground,
@@ -59,9 +60,9 @@ for idx, barSetup in ipairs(bars) do
 				{
 					layout = (barSetup.position == 'bottom' or barSetup.position == 'top')
 					and wibox.layout.align.horizontal or wibox.layout.align.vertical,
-					moduleWidgets('left', idx),
-					moduleWidgets('center', idx),
-					moduleWidgets('right', idx),
+					moduleWidgets('left', idx, screen),
+					moduleWidgets('center', idx, screen),
+					moduleWidgets('right', idx, screen),
 				}
 			}
 		}
@@ -99,7 +100,7 @@ for idx, barSetup in ipairs(bars) do
 				--restrict_workarea = false
 			}
 			s.bar[idx] = bar
-			bar:setup(createBarWidget(idx))
+			bar:setup(createBarWidget(idx, s))
 
 			awesome.connect_signal('paperbush::initialized', function()
 				bar.visible = true
