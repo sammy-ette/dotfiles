@@ -1,7 +1,7 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
 local compositor = require 'modules.compositor'
-local settings = require 'conf.settings'
+local settings = require 'sys.settings'
 local naughty = require 'naughty'
 local sound = require 'sys.sound'
 
@@ -18,16 +18,8 @@ local programs = {
 	'unclutter',
 --	[[xss-lock awesome-client "require 'ui.lockscreen'.lock()"]],
 	'/usr/libexec/polkit-gnome-authentication-agent-1 &',
-	string.format('gsettings set org.gnome.desktop.interface color-scheme prefer-%s', beautiful.dark and 'dark' or 'light')
+	string.format('gsettings set org.gnome.desktop.interface color-scheme prefer-%s', settings.getConfig 'theme'.type)
 }
-
-if settings.picom then
-	-- toggle
-	compositor.on()
-else
-	--compositor.off()
-end
-
 
 awesome.connect_signal('paperbush::initialized', function(first)
 	if not first then return end
