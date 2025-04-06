@@ -1,4 +1,5 @@
 local command = require 'sys.command'
+local gears = require 'gears'
 
 command.add {
 	name = 'client:focus',
@@ -26,6 +27,20 @@ command.add {
 	action = function(c)
 		c.maximized = not c.maximized
 		c:raise()
+	end
+}
+
+command.add {
+	name = 'client:minimize',
+	action = function(c)
+		gears.timer.delayed_call(function() c.minimized = true end)
+	end
+}
+
+command.add {
+	name = 'client:close',
+	action = function(c)
+		c:kill()
 	end
 }
 

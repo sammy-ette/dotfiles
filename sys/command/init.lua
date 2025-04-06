@@ -1,3 +1,4 @@
+local naughty = require 'naughty'
 local M = {
 	list = {}
 }
@@ -15,7 +16,11 @@ function M.perform(name, ...)
 		--return pcall(cmd.action)
 		cmd.action(...)
 	else
-		error('attempt to perform unknown command ' .. name)
+		naughty.notify {
+			title = name,
+			text = 'attempt to perform unknown command',
+			category = 'warning'
+		}
 	end
 end
 function M.get(name)

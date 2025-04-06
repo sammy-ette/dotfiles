@@ -5,6 +5,7 @@ local wibox = require 'wibox'
 local util = require 'sys.util'
 local button = require 'ui.widget.button'
 local icon = require 'ui.widget.icon'
+local command = require 'sys.command'
 
 client.connect_signal('request::titlebars', function(c)
 	if c.requests_no_titlebar then
@@ -13,23 +14,30 @@ client.connect_signal('request::titlebars', function(c)
 
 	local buttons = gears.table.join(
 		awful.button({}, 1, function()
-			c:emit_signal('request::activate', 'titlebar', {raise = true})
-			awful.mouse.client.move(c)
+			command.perform('client:move', c)
 		end),
 		awful.button({}, 3, function()
-			c:emit_signal('request::activate', 'titlebar', {raise = true})
-			awful.mouse.client.resize(c)
+			command.perform('client:resize', c)
 		end)
 	)
 
 	local minimize = button {
 		icon = 'minimize',
+		onClick = function()
+			command.perform('client:minimize', c)
+		end
 	}
 	local maximize = button {
 		icon = 'expand-less',
+		onClick = function()
+			command.perform('client:maximize', c)
+		end
 	}
 	local close = button {
 		icon = 'close',
+		onClick = function()
+			command.perform('client:close', c)
+		end
 	}
 
 	local spacing = util.dpi(8)
