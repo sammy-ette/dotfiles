@@ -16,6 +16,7 @@ local textbox = require 'ui.widget.textbox'
 local startMenu
 
 local apps = {}
+local appsIndexes = {}
 local appList = wibox.widget {
 	layout = wibox.layout.overflow.vertical()
 }
@@ -32,6 +33,7 @@ local function handleSearch(input)
 	appList:scroll(-9999)
 
 	local matchIdx = 1
+	appsIndexes = {}
 	for idx, appName in ipairs(apps) do
 		local wid = appList.children[idx]
 		if wid == nil then return end
@@ -41,6 +43,7 @@ local function handleSearch(input)
 			if match then
 				wid.visible = true
 				matchIdx = matchIdx + 1
+				table.insert(appsIndexes, idx)
 			else
 				wid.visible = false
 				appList:emit_signal 'widget::redraw_needed'
@@ -63,6 +66,10 @@ end
 searchInput = awful.widget.prompt {
 	prompt = '',
 	autoexec = true,
+	exe_callback = function()
+		local wid = appList.children[appsIndexes[1]]
+		wid:launch()
+	end,
 	changed_callback = handleSearch,
 	done_callback = resetSearch,
 	highlighter = function(before, after)
@@ -135,7 +142,7 @@ local function fetchApps()
 			id = app.name,
 			{
 				widget = wibox.container.background,
-				bg = beautiful.popupBackground,
+				bg = beautiful.panelBackground,
 				shape = util.rrect(beautiful.radius),
 				id = 'bg',
 				{
@@ -190,11 +197,15 @@ local function fetchApps()
 
 		appWid.buttons = {
 			awful.button({}, 1, function()
-				startMenu:toggle()
-				app.launch()
-				resetSearch()
+				appWid:launch()
 			end)
 		}
+
+		function appWid:launch()
+			startMenu:toggle()
+			app.launch()
+			resetSearch()
+		end
 
 		--helpers.displayClickable(appWid, {bg = bgcolor})
 		appList:add(appWid)
@@ -254,10 +265,10 @@ startMenu = panels.create {
 							from  = {menuWidth, 0},
 							to = {menuWidth, menuHeight - (searchHeight / 1.5) - util.dpi(beautiful.titlebarHeight)},
 							stops = {
-								{0, beautiful.background .. '00'},
-								{0.8, beautiful.background .. '00'},
-								{0.88, beautiful.background .. 'cc'},
-								{0.9, beautiful.background},
+								{0, beautiful.panelBackground .. '00'},
+								{0.8, beautiful.panelBackground .. '00'},
+								{0.88, beautiful.panelBackground .. 'cc'},
+								{0.9, beautiful.panelBackground},
 							}
 						}
 					}
