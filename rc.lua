@@ -5,7 +5,7 @@ awesome.register_xproperty('initialized', 'boolean')
 require 'sys'
 require 'ui'
 
-awesome.emit_signal('paperbush::initialized', awesome.get_xproperty 'initialized')
+awesome.emit_signal('paperbush::initialized', not awesome.get_xproperty 'initialized')
 awesome.set_xproperty('initialized', true)
 
 collectgarbage('setpause', 110)
