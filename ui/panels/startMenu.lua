@@ -8,15 +8,79 @@ local Gio = lgi.Gio
 
 local util = require 'sys.util'
 local extrautils = require 'libs.extrautils'()
+local fzy = require 'fzy'
+
 local titlebar = require 'ui.widget.titlebar'
 local panels = require 'ui.panels'
 local textbox = require 'ui.widget.textbox'
 local startMenu
 
---local apps = {}
+local apps = {}
 local appList = wibox.widget {
 	layout = wibox.layout.overflow.vertical()
 }
+
+-- [[ App search ]] --
+local searchInputPlaceholder = wibox.widget {
+	widget = textbox,
+	text = 'Search...',
+	font = beautiful.fontName .. ' Bold',
+	color = beautiful.foregroundSecondary
+}
+
+local function handleSearch(input)
+	appList:scroll(-9999)
+
+	local matchIdx = 1
+	for idx, appName in ipairs(apps) do
+		local wid = appList.children[idx]
+		if wid == nil then return end
+
+		if input ~= '' then
+			local match = fzy.has_match(input, appName)
+			if match then
+				wid.visible = true
+				matchIdx = matchIdx + 1
+			else
+				wid.visible = false
+				appList:emit_signal 'widget::redraw_needed'
+			end
+		else
+			wid.visible = true
+			appList:emit_signal 'widget::redraw_needed'
+		end
+	end
+end
+
+local searchInput
+local function resetSearch()
+	handleSearch ''
+	searchInput.widget.text = ''
+	searchInputPlaceholder.visible = true
+	awful.keygrabber.stop()
+end
+
+searchInput = awful.widget.prompt {
+	prompt = '',
+	autoexec = true,
+	changed_callback = handleSearch,
+	done_callback = resetSearch,
+	highlighter = function(before, after)
+		return '<b>' .. util.colorizeText(before, beautiful.foregroundSecondary), util.colorizeText(after, beautiful.foregroundSecondary) .. '</b>'
+	end,
+	bg = '#00000000'
+}
+
+
+searchInput:connect_signal('button::press', function(_, _, _, button)
+	if button == 1 then
+		print 'running search'
+		searchInputPlaceholder.visible = false
+		searchInput:run()
+	end
+end)
+
+-- [[ App search done ]] --
 
 local function setupAppList()
 	-- setting spacing makes it have a wack amount of space
@@ -63,7 +127,7 @@ local function fetchApps()
 		end
 
 		collision[name] = true
-		--table.insert(apps, app.name)
+		table.insert(apps, app.name)
 
 		local appWid = wibox.widget {
 			widget = wibox.container.margin,
@@ -126,10 +190,9 @@ local function fetchApps()
 
 		appWid.buttons = {
 			awful.button({}, 1, function()
-				--opts.menu:off()
 				startMenu:toggle()
 				app.launch()
-				--resetSearch()
+				resetSearch()
 			end)
 		}
 
@@ -142,6 +205,9 @@ end
 
 fetchApps()
 
+local menuHeight = util.dpi(580)
+local menuWidth = util.dpi(460)
+local searchHeight = util.dpi(32)
 startMenu = panels.create {
 	widget = {
 		layout = wibox.layout.fixed.vertical,
@@ -154,28 +220,74 @@ startMenu = panels.create {
 			{
 				layout = wibox.layout.stack,
 				{
-					layout = wibox.container.place,
-					halign = 'right',
-					forced_width = util.dpi(10),
+					layout = wibox.container.margin,
+					bottom = searchHeight,
 					{
-						widget = wibox.container.constraint,
-						width = util.dpi(10),
+						layout = wibox.layout.stack,
 						{
-							widget = wibox.container.margin,
+							layout = wibox.container.place,
+							halign = 'right',
+							forced_width = util.dpi(10),
 							{
-								widget = wibox.widget.separator,
-								color = beautiful.backgroundTertiary,
-								shape = gears.shape.rounded_bar,
+								widget = wibox.container.constraint,
+								width = util.dpi(10),
+								{
+									widget = wibox.container.margin,
+									{
+										widget = wibox.widget.separator,
+										color = beautiful.backgroundTertiary,
+										shape = gears.shape.rounded_bar,
+									}
+								}
+							}
+						},
+						appList,
+					}
+				},
+				{
+					layout = wibox.container.margin,
+					right = util.dpi(12),
+					{
+						widget = wibox.container.background,
+						bg = {
+							type  = 'linear',
+							from  = {menuWidth, 0},
+							to = {menuWidth, menuHeight - (searchHeight / 1.5) - util.dpi(beautiful.titlebarHeight)},
+							stops = {
+								{0, beautiful.background .. '00'},
+								{0.8, beautiful.background .. '00'},
+								{0.88, beautiful.background .. 'cc'},
+								{0.9, beautiful.background},
 							}
 						}
 					}
 				},
-				appList
+				{
+					layout = wibox.container.place,
+					valign = 'bottom',
+					halign = 'center',
+					{
+						layout = wibox.container.constraint,
+						strategy = 'exact',
+						height = searchHeight,
+						width = menuWidth,
+						{
+							layout = wibox.layout.stack,
+							searchInputPlaceholder,
+							searchInput,
+						}
+					}
+				}
 			}
 		}
 	},
-	height = util.dpi(580),
-	width = util.dpi(460),
+	manage = function(panel, open)
+		if not open then
+			resetSearch()
+		end
+	end,
+	height = menuHeight,
+	width = menuWidth,
 }
 
 return startMenu
