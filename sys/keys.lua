@@ -5,7 +5,7 @@ local command = require 'sys.command'
 -- Define default keybinds
 -- TODO: Command palette system like Lite XL, get description
 -- from command definitions if one for a keybind isnt given (so basically all of them)
-settings.defineType('keys', {
+local keyTable = {
 	{
 		group = 'system',
 		key = 'M-S-/',
@@ -77,6 +77,16 @@ settings.defineType('keys', {
 		action = 'client:move-down'
 	},
 	{
+		group = 'management',
+		key = 'M-Tab',
+		action = 'tag:next'
+	},
+	{
+		group = 'management',
+		key = 'M-S-Tab',
+		action = 'tag:previous'
+	},
+	{
 		group = 'system',
 		key = 'M-l',
 		action = 'screen:lock'
@@ -135,7 +145,17 @@ settings.defineType('keys', {
 		key = 'M-space',
 		action = 'client:toggle-floating'
 	}
-})
+}
+
+for i = 1, 9 do
+	table.insert(keyTable, {
+		group = 'tag',
+		key = 'M-' .. tostring(i),
+		action = 'tag:go-to-' .. tostring(i)
+	})
+end
+
+settings.defineType('keys', keyTable)
 
 local function parseKey(keyList)
 	local adjustKey = {
@@ -147,7 +167,7 @@ local function parseKey(keyList)
 		['M'] = 'Mod4', -- Super/Windows Key
 		['C'] = 'Control', -- Ctrl
 		['A'] = 'Mod1', -- Alt
-		['S'] = 'Shift', -- Alt
+		['S'] = 'Shift', -- Shift
 	}
 
 	local modifiers = {}

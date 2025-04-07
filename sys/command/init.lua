@@ -30,7 +30,8 @@ end
 function M.defaults()
 	for _, name in ipairs {
 		'audio',
-		'client'
+		'client',
+		'tag'
 	} do
 		require('sys.command.' .. name)
 	end
