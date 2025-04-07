@@ -29,7 +29,8 @@ settings.defineType('bars', {
 		shape = 'rectangle',
 		modules = {
 			left = {
-				'startMenu'
+				'startMenu',
+				'workspace'
 			},
 			center = {},
 			right = {

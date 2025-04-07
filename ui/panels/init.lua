@@ -30,10 +30,21 @@ function M.create(args)
 			shape = args.shape or util.rrect(args.radius),
 			args.widget
 		},
-		height = args.height,
+		height = args.height ~= 'screen' and args.height or 1,
 		width = args.width,
 		open = false,
 	}
+
+	function panel:resize()
+		if args.height == 'screen' then
+			local buffer = 0
+			local scr = awful.screen.focused()
+			for _, bar in ipairs(scr.bar) do
+				buffer = buffer + bar.height
+			end
+			panel.height = scr.geometry.height - beautiful.useless_gap - beautiful.useless_gap - buffer
+		end
+	end
 
 	function panel:align(barIdx, reposition)
 		if reposition then
@@ -70,6 +81,18 @@ function M.create(args)
 			--honor_workarea = true,
 			--honor_padding = true
 		})
+		if alignment == 'left' then
+			--[[
+			local buffer = 0
+			local scr = awful.screen.focused()
+			for _, bar in ipairs(scr.bar) do
+				if bar.position == 'top' or bar.position == 'bottom' then
+					buffer = buffer + bar.height
+				end
+			end
+			]]--
+			panel.y = beautiful.useless_gap
+		end
 
 		local buffer = barIdx and scr.bar[barIdx].height or 0
 		--local hideHeight, revealHeight
@@ -81,6 +104,10 @@ function M.create(args)
 			panel.revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
 		end
 
+		if alignment == 'left' then
+			panel.hideWidth = -args.width
+			panel.revealWidth = beautiful.useless_gap + buffer
+		end
 
 		if vert == 'bottom' and panel.open then
 			panel.y = panel.hideHeight
@@ -92,17 +119,24 @@ function M.create(args)
 			duration = 0.25,
 			rate = 120,
 			override_dt = true,
-			subscribed = function(y)
-				panel.y = y
-				if y == panel.hideHeight then
+			subscribed = function(p)
+				if panel.hideWidth then
+					panel.x = p
+				else
+					panel.y = p
+				end
+
+				if panel.hideHeight and p == panel.hideHeight then
+					panel.visible = false
+				elseif panel.hideWidth and p == panel.hideWidth then
 					panel.visible = false
 				end
 
-				if panel.open and y == panel.revealHeight and panel.revealed then
+				if panel.open and p == panel.revealHeight and panel.revealed then
 					panel:revealed()
 				end
 			end,
-			pos = panel.open and panel.hideHeight or panel.revealHeight
+			pos = panel.open and (panel.hideHeight and panel.hideHeight or panel.hideWidth) or (panel.revealHeight and panel.revealHeight or panel.revealWidth)
 		}
 	end
 
@@ -116,14 +150,16 @@ function M.create(args)
 
 	function panel:on(barIdx)
 		panel.open = true
-		panel:align(barIdx)
+		local oldHeight = panel.height
+		panel:resize()
+		panel:align(barIdx, oldHeight)
 
 		if panel.manage then
 			panel:manage(panel.open)
 		end
 
 		local animator = panel:animator()
-		animator.target = panel.revealHeight
+		animator.target = panel.revealHeight and panel.revealHeight or panel.revealWidth
 		panel.visible = true
 	end
 
@@ -136,7 +172,7 @@ function M.create(args)
 		end
 
 		local animator = panel:animator()
-		animator.target = panel.hideHeight
+		animator.target = panel.hideHeight and panel.hideHeight or panel.hideWidth
 	end
 
 	return panel

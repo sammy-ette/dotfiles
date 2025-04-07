@@ -29,7 +29,8 @@ for idx, barSetup in ipairs(bars) do
 			startMenu = startMenuActivator,
 			time = require 'ui.widget.bar.time',
 			capslock = require 'ui.widget.bar.capslock',
-			apps = require 'ui.widget.bar.apps'(screen)
+			apps = require 'ui.widget.bar.apps'(screen),
+			workspace = require 'ui.widget.bar.workspace'(screen)
 		}
 		for _, moduleName in ipairs(barSetup.modules[position]) do
 			local module = moduleList[moduleName]
