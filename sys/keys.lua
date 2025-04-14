@@ -87,6 +87,16 @@ local keyTable = {
 		action = 'tag:previous'
 	},
 	{
+		group = 'management',
+		key = 'M-space',
+		action = 'layout:next'
+	},
+	{
+		group = 'management',
+		key = 'M-S-space',
+		action = 'layout:previous'
+	},
+	{
 		group = 'system',
 		key = 'M-l',
 		action = 'screen:lock'

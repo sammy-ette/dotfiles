@@ -31,6 +31,7 @@ function M.defaults()
 	for _, name in ipairs {
 		'audio',
 		'client',
+		'management',
 		'tag',
 		'utility'
 	} do
