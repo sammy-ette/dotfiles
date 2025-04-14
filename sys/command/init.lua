@@ -32,6 +32,7 @@ function M.defaults()
 		'audio',
 		'client',
 		'management',
+		'screen',
 		'tag',
 		'utility'
 	} do
