@@ -30,7 +30,9 @@ for idx, barSetup in ipairs(bars) do
 			time = require 'ui.widget.bar.time',
 			capslock = require 'ui.widget.bar.capslock',
 			apps = require 'ui.widget.bar.apps'(screen),
-			workspace = require 'ui.widget.bar.workspace'(screen)
+			workspace = require 'ui.widget.bar.workspace'(screen),
+			systray = require 'ui.widget.bar.systray'(screen),
+			layout = require 'ui.widget.bar.layout'(screen)
 		}
 		for _, moduleName in ipairs(barSetup.modules[position]) do
 			local module = moduleList[moduleName]
@@ -44,7 +46,7 @@ for idx, barSetup in ipairs(bars) do
 
 		return {
 			layout = wibox.layout.fixed.horizontal,
-			spacing = util.dpi(barSetup.modules[position].spacing or 10),
+			spacing = util.dpi(barSetup.modules[position].spacing or beautiful.spacing),
 			table.unpack(widgets)
 		}
 	end

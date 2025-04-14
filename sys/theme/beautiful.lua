@@ -23,7 +23,11 @@ beautiful.init(gears.table.crush({
 	panelBackground = palette.backgroundSecondary,
 	
 	useless_gap = util.dpi(6),
+	spacing = 10,
 
 	notificationWidth = util.dpi(340),
-	notificationHeight = util.dpi(120)
+	notificationHeight = util.dpi(120),
+
+	systray_icon_spacing = util.dpi(5),
+	bg_systray = palette.backgroundTertiary
 }, palette))
