@@ -262,7 +262,7 @@ naughty.connect_signal('request::display', function(notification)
 										width = beautiful.notificationWidth / 5,
 										{
 											widget = wibox.widget.imagebox,
-											clip_shape = helpers.rrect(beautiful.radius / 2),
+											clip_shape = util.rrect(beautiful.radius / 2),
 											image = gears.surface.load_uncached_silently(notifImage)
 										}
 									}
