@@ -31,6 +31,7 @@ end
 function M.state(cb)
 	spawn('pamixer --get-mute && pamixer --get-volume', function(stdout)
 		local mute = stdout:match '([truefalse]+)' == 'true'
+		local volume = stdout:match '%d+'
 
 		cb(volume, mute)
 	end)
@@ -52,12 +53,20 @@ function M.state(cb)
 	]]--
 end
 
+local function round(val, roundAmnt)
+	return math.floor(val / roundAmnt) * roundAmnt
+end
+
 function M.volumeUp()
-	spawn('pactl set-sink-volume @DEFAULT_SINK@ +'..step..'%')
+	M.state(function(vol)
+		M.setVolume(round(vol + step, 5))
+	end)
 end
 
 function M.volumeDown()
-	spawn('pactl set-sink-volume @DEFAULT_SINK@ -'..step..'%')
+	M.state(function(vol)
+		M.setVolume(round(vol - step, 5))
+	end)
 end
 
 function M.setVolume(vol)
