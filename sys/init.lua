@@ -7,12 +7,12 @@ settings.defineType('wallpaper', {
 	home = {
 		tiled = false,
 		acrossScreens = false,
-		image = gfs.get_configuration_dir() .. 'wallpapers/aster.png'
+		image = gfs.get_configuration_dir() .. 'wallpapers/meadows.jpg'
 	},
 	lock = {
 		tiled = false,
 		acrossScreens = false,
-		image = gfs.get_configuration_dir() .. 'wallpapers/aster.png'
+		image = gfs.get_configuration_dir() .. 'wallpapers/meadows.jpg'
 	},
 })
 
