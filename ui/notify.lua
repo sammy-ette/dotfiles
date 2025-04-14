@@ -26,7 +26,7 @@ local function categoryToIcon(cat)
 	return mapping or cat
 end
 
-local briefTimeout = 3.5
+local briefTimeout = 4.5
 local briefInitSize = util.dpi(32)
 local scr = awful.screen.focused()
 local briefNotifMaxSize = scr.geometry.width / 4
@@ -113,7 +113,7 @@ local briefNotifAnimator = rubato.timed {
 }
 
 function briefNotif:revealed()
-	local briefTitleW = briefTitle:get_preferred_size(awful.screen.focused().index)
+	local briefTitleW = math.min(briefTitle:get_preferred_size(awful.screen.focused().index), briefNotifMaxSize / 2.5)
 	local briefMessageW = briefMessage:get_preferred_size(awful.screen.focused().index)
 
 	local briefNotifPreferredSize = briefMargins + briefInitSize + briefSpacing + briefTitleW + briefSpacing + briefMessageW + briefSpacing + briefMargins
