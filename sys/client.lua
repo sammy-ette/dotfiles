@@ -41,6 +41,14 @@ client.connect_signal('manage', function(c)
 	restrictHeight(c)
 	if not awesome.startup then awful.client.setslave(c) end
 
+	if c.maximized and not c.fullscreen then
+		awful.placement.maximize(c, {
+			honor_padding = true,
+			honor_workarea = true,
+			--margins = beautiful.useless_gap * beautiful.dpi(2)
+		})
+	end
+
 	local cairo = require('lgi').cairo
 	local default_icon = extrautils.apps.lookup_icon 'application-x-executable'
 	if c and c.valid and not c.icon then
