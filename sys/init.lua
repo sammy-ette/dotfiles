@@ -30,12 +30,15 @@ settings.defineType('bars', {
 		modules = {
 			left = {
 				'startMenu',
-				'workspace'
+				'workspace',
+				'apps'
 			},
 			center = {},
 			right = {
+				'systray',
 				'capslock',
-				'time'
+				'time',
+				'layout'
 			}
 		}
 	}
