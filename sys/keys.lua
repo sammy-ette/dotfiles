@@ -102,6 +102,12 @@ local keyTable = {
 		action = 'screen:window-screenshot'
 	},
 
+	{
+		group = 'utility',
+		key = 'M-t',
+		action = 'utility:open-terminal'
+	},
+
 	-- Client Mouse Binds
 	{
 		group = 'client',
