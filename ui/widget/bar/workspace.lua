@@ -6,7 +6,6 @@ local workspacePanel = require 'ui.panels.workspaces'
 local util = require 'sys.util'
 
 return function(scr)
-	local t = scr.selected_tag
 	local indicator = wibox.widget {
 		widget = wibox.widget.textbox,
 	}
@@ -26,11 +25,11 @@ return function(scr)
 		end)
 	}
 
-	local function updateText()
+	local function updateText(t)
 		indicator.text = t.name ~= tostring(t.index) and string.format('Workspace %d (%s)', t.index, t.name) or string.format('Workspace %d', t.index)
 	end
-	updateText()
+	updateText(scr.selected_tag)
 
-	tag.connect_signal('property::selected', updateText)
+	awful.tag.attached_connect_signal(scr, 'property::selected', updateText)
 	return w
 end
