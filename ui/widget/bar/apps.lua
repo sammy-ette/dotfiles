@@ -8,11 +8,11 @@ local rubato = require 'libs.rubato'
 local util = require 'sys.util'
 
 return function(screen)
-		local baseClientIndicator = {
+	local baseClientIndicator = {
 		height = util.dpi(3),
-		width = util.dpi(3)
+		width = util.dpi(8)
 	}
-	local clientIndicatorShift = util.dpi(14)
+	local clientIndicatorShift = util.dpi(12)
 	
 	return awful.widget.tasklist {
 		screen = screen,
@@ -42,7 +42,7 @@ return function(screen)
 				local styles = {
 					bg_normal = beautiful.shade3,
 					bg_focus = beautiful.accent,
-					bg_minimize = beautiful.shade1,
+					bg_minimize = beautiful.shade3,
 					shape = util.rrect(6)
 				}
 
@@ -105,6 +105,8 @@ return function(screen)
 				function self.update()
 					if client.focus == c then
 						animator.target = baseClientIndicator.width + clientIndicatorShift
+					elseif c.minimized then
+						animator.target = baseClientIndicator.height
 					else
 						animator.target = baseClientIndicator.width
 					end
