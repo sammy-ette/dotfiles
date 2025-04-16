@@ -29,7 +29,7 @@ end
 local briefTimeout = 4.5
 local briefInitSize = util.dpi(32)
 local scr = awful.screen.focused()
-local briefNotifMaxSize = scr.geometry.width / 4
+local briefNotifMaxSize = scr.geometry.width / 3.5
 local briefNotifFullSize = briefInitSize
 
 local briefIcon = icon {
