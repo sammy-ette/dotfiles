@@ -33,6 +33,7 @@ function M.defaults()
 		'client',
 		'management',
 		'screen',
+		'system',
 		'tag',
 		'utility'
 	} do

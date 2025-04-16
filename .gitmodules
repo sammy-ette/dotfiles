@@ -7,3 +7,6 @@
 [submodule "libs/rubato"]
 	path = libs/rubato
 	url = https://github.com/andOrlando/rubato
+[submodule "libs/switcher"]
+	path = libs/switcher
+	url = https://github.com/troglobit/awesome-switcher

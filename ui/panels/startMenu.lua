@@ -8,6 +8,7 @@ local Gio = lgi.Gio
 
 local util = require 'sys.util'
 local power = require 'sys.power'
+local command = require 'sys.command'
 local extrautils = require 'libs.extrautils'()
 local fzy = require 'fzy'
 
@@ -356,6 +357,13 @@ startMenu = panels.create {
 	height = menuHeight,
 	width = menuWidth,
 	growPosition = 'top'
+}
+
+command.add {
+	name = 'system:start-menu',
+	action = function()
+		startMenu:toggle()
+	end
 }
 
 return startMenu
