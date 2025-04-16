@@ -23,10 +23,10 @@ function M.defineType(name, schema)
 	local config
 
 	if not gears.filesystem.file_readable(configPath) then
-		config = schema
+		config = {__version = 1, data = schema}
 		file:create_async(Gio.FileCreateFlags.NONE, GLib.PRIORITY_DEFAULT, nil, function(_, res)
 			local stream = file:create_finish(res)
-			local encoded = json.encode(schema)
+			local encoded = json.encode(config)
 			stream:write_async(encoded, GLib.PRIORITY_DEFAULT, nil, function(_, res) stream:write_finish(res) end)
 		end)
 	else
@@ -34,19 +34,17 @@ function M.defineType(name, schema)
 		config = json.decode(content)
 	end
 
-	if not config.__version then
-		config.__version = 1
-	end
-
 	M.confs[name] = {
 		fileHandle = file,
-		config = config
+		config = config.data,
+		version = config.__version
 	}
 end
 
 function M.write(configName)
+	print('writing', configName)
 	local file = M.confs[configName].fileHandle
-	file:replace_contents_bytes_async(GLib.Bytes(json.encode(M.confs[configName].config)), nil, false, Gio.FileCreateFlags.REPLACE_DESTINATION, nil, function(_, res)
+	file:replace_contents_bytes_async(GLib.Bytes(json.encode({__version = M.confs[configName].version, data = M.confs[configName].config})), nil, false, Gio.FileCreateFlags.REPLACE_DESTINATION, nil, function(_, res)
 		file:replace_contents_finish(res)
 	end)
 end
@@ -62,10 +60,14 @@ function M.getConfig(configName)
 	local confWrap = {}
 	setmetatable(confWrap, {
 		__index = function(_, k)
-			return conf[k]
+			return conf[k] or M.confs[configName][k]
 		end,
 		__newindex = function(_, k, v)
-			M.set(configName, k, v)
+			if k == 'version' then
+				M.confs[configName].version = v
+			else
+				M.set(configName, k, v)
+			end
 		end
 	})
 
@@ -79,11 +81,11 @@ end
 -- to migrate to the latest config schema
 function M.migrate(configName, opts)
 	local conf = M.getConfig(configName)
-	if conf.__version > opts.version or conf.__version == opts.version then return end
+	if conf.version > opts.version or conf.version == opts.version then return end
 
-	print(string.format('migrating %s from ver %d to %d', configName, conf.__version, opts.version))
+	print(string.format('migrating %s from ver %d to %d', configName, conf.version, opts.version))
 	opts.migrator(conf)
-	conf.__version = opts.version
+	conf.version = opts.version
 	M.write(configName)
 end
 
