@@ -27,9 +27,9 @@ return function(screen)
 		buttons = gears.table.join(
 			awful.button({}, 1, function (c)
 				if c == client.focus then
-					command.perform('client:minimize', c)
+					command.perform('client:minimize', {extras = {c}})
 				else
-					command.perform('client:focus', c)
+					command.perform('client:focus', {extras = {c}})
 				end
 			end)
 		),

@@ -14,36 +14,40 @@ client.connect_signal('request::titlebars', function(c)
 
 	local buttons = gears.table.join(
 		awful.button({}, 1, function()
-			command.perform('client:move', c)
+			command.perform('client:move', {extras = {c}})
 		end),
 		awful.button({}, 3, function()
-			command.perform('client:resize', c)
+			command.perform('client:resize', {extras = {c}})
 		end)
 	)
 
+	local buttonSize = util.dpi(20)
 	local minimize = button {
 		icon = 'minimize',
 		onClick = function()
-			command.perform('client:minimize', c)
-		end
+			command.perform('client:minimize', {extras = {c}})
+		end,
+		size = buttonSize
 	}
 	local maximize = button {
 		icon = 'expand-less',
 		onClick = function()
-			command.perform('client:maximize', c)
-		end
+			command.perform('client:maximize', {extras = {c}})
+		end,
+		size = buttonSize
 	}
 	local close = button {
 		icon = 'close',
 		onClick = function()
-			command.perform('client:close', c)
-		end
+			command.perform('client:close', {extras = {c}})
+		end,
+		size = buttonSize
 	}
 
 	local spacing = util.dpi(4)
 
 	awful.titlebar(c, {
-		height = util.dpi(beautiful.titlebarHeight),
+		size = util.dpi(beautiful.titlebarHeight),
 		bg_normal = beautiful.titlebarBackground,
 		bg_focus = beautiful.titlebarBackground
 	}):setup {
