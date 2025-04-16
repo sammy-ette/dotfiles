@@ -20,7 +20,7 @@ end
 function M.play(s)
 	-- --property=media.role=event
 	-- for some reason causes it not to play audio...
-	local cmd = string.format('paplay --volume %f %s', M.volume * 65536, gfs.get_configuration_dir() .. 'assets/sounds/' .. (sounds[s] or s .. '.wav'))
+	local cmd = string.format('paplay --property=media.role=event --volume %f %s', M.volume * 65536, gfs.get_configuration_dir() .. 'assets/sounds/' .. (sounds[s] or s .. '.wav'))
 	awful.spawn.easy_async(cmd, function(tbl) print(tbl) end)
 end
 
@@ -74,7 +74,7 @@ function M.setVolume(vol)
 	-- awesome.emit_signal('evil::volume', next_vol, mute)
 end
 
-function M.muteVolume()
+function M.toggleMute()
 	spawn('pamixer --toggle-mute')
 end
 

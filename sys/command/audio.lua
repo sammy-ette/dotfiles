@@ -16,8 +16,8 @@ command.add {
 }
 
 command.add {
-	name = 'audio:mute-volume',
+	name = 'audio:toggle-mute',
 	action = function()
-		sound.mute()
+		sound.toggleMute()
 	end
 }

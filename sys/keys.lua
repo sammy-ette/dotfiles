@@ -35,7 +35,7 @@ local keyTable = {
 	{
 		group = 'audio',
 		key = 'XF86AudioMute',
-		action = 'audio:mute'
+		action = 'audio:toggle-mute'
 	},
 	{
 		group = 'audio',
