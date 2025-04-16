@@ -9,15 +9,30 @@ local M = {}
 
 -- @tparam[opt={}] table args
 -- @tparam[opt] string args.attach Where the panel should be attached (position wise), either mouse, or top_right, bottom_left, etc.
--- @tparam[opt] string args.widget
+-- @tparam[opt] table args.widget
 -- @tparam[opt] string args.bg Color to use for the panel background
--- @tparam[opt] string args.shape Shape of the panel window
--- @tparam[opt] string args.radius Radius for rounded rectangle shape
+-- @tparam[opt] function args.shape Shape of the panel window
+-- @tparam[opt] number args.radius Radius for rounded rectangle shape
+-- @tparam[opt] boolean args.growHeight Should height be grown in animation or stay constant?
+-- @tparam[opt] boolean args.growWidth Should width be grown in animation or stay constant?
+-- @tparam[opt] boolean args.growPosition Where does the animation start from (relative to the panel's position).
 function M.create(args)
-	--local panel = M.wibox(args)
-	--panel:setup(args.widget)
-	--TODO: handle margins and positions properly for bars on left/right
+	local function accumBars(position)
+		local out = 0
+
+		for _, bar in ipairs(awful.screen.focused().bar) do
+			if position == bar.position then
+				out = out + (bar.height or bar.width)
+			end
+		end
+
+		return out
+	end
+
 	args.attach = args.attach or 'mouse'
+	args.growHeight = args.growHeight == nil and true or args.growHeight
+	--args.invertShrink = true
+
 	local panel = wibox {
 		shape = args.fakeShape or util.rrect(args.radius or beautiful.radius),
 		ontop = true,
@@ -25,28 +40,29 @@ function M.create(args)
 		--bg = args.bg or beautiful.panelBackground,
 		bg = '#00000000',
 		widget = wibox.widget {
-			layout = wibox.container.background,
-			bg = args.bg or beautiful.panelBackground,
-			shape = args.shape or util.rrect(args.radius),
-			args.widget
+			layout = wibox.container.constraint,
+			strategy = 'exact',
+			height = args.height,
+			{
+				layout = wibox.container.background,
+				bg = args.bg or beautiful.panelBackground,
+				shape = args.shape or util.rrect(args.radius),
+				args.widget
+			}
 		},
 		height = args.height ~= 'screen' and args.height or 1,
-		width = args.width,
+		width = args.width ~= 'screen' and args.width or 1,
 		open = false,
 	}
 
 	function panel:resize()
 		if args.height == 'screen' then
-			local buffer = 0
 			local scr = awful.screen.focused()
-			for _, bar in ipairs(scr.bar) do
-				buffer = buffer + bar.height
-			end
-			panel.height = scr.geometry.height - beautiful.useless_gap - beautiful.useless_gap - buffer
+			panel.height = scr.geometry.height - (beautiful.useless_gap * 2) - accumBars 'top' - accumBars 'bottom'
 		end
 	end
 
-	function panel:align(barIdx, reposition)
+	function panel:align(reposition)
 		if reposition then
 		elseif panel.revealHeight then
 			return
@@ -54,12 +70,23 @@ function M.create(args)
 
 		local scr = awful.screen.focused()
 		local function locateQuadrant(x, y)
-			local isTop = y < (scr.geometry.height / 2)
-			local isLeft = x < (scr.geometry.width / 2)
+			local isTop = y < (scr.geometry.height / 3)
+			local isLeft = x < (scr.geometry.width / 3)
+			local isCenterY = y > (scr.geometry.height / 3) and y < ((scr.geometry.height / 3) * 2)
+			local isCenterX = x > (scr.geometry.width / 3) and x < ((scr.geometry.width / 3) * 2)
+			--print 'center y, centerx, y, x'
+			--print(isCenterY, isCenterX, y, x)
 			local vertAlign = (isTop and 'top' or 'bottom')
 			local horizAlign = (isLeft and 'left' or 'right')
 
-			return vertAlign .. '_' .. horizAlign, vertAlign, horizAlign
+			if isCenterY then
+				vertAlign = nil
+			end
+			if isCenterX then
+				horizAlign = nil
+			end
+
+			return table.concat({vertAlign, horizAlign}, '_'), vertAlign, horizAlign
 		end
 
 		local alignment, vert
@@ -70,19 +97,22 @@ function M.create(args)
 			alignment = args.attach
 			vert = args.attach:match '([%w]+)'
 		end
+		if not args.growPosition then
+			args.growPosition = vert
+		end
 		awful.placement.align(panel, {
 			position = alignment,
 			margins = {
-				left = beautiful.useless_gap,
-				right = beautiful.useless_gap,
-				top = beautiful.useless_gap,
-				bottom = beautiful.useless_gap
+				left = beautiful.useless_gap + accumBars 'left',
+				right = beautiful.useless_gap + accumBars 'right',
+				top = beautiful.useless_gap + accumBars 'top',
+				bottom = beautiful.useless_gap + accumBars 'bottom'
 			},
 			--honor_workarea = true,
 			--honor_padding = true
 		})
+		--[[
 		if alignment == 'left' then
-			--[[
 			local buffer = 0
 			local scr = awful.screen.focused()
 			for _, bar in ipairs(scr.bar) do
@@ -90,7 +120,6 @@ function M.create(args)
 					buffer = buffer + bar.height
 				end
 			end
-			]]--
 			panel.y = beautiful.useless_gap
 		end
 
@@ -100,7 +129,7 @@ function M.create(args)
 			panel.hideHeight = -args.height
 			panel.revealHeight = beautiful.useless_gap + buffer
 		elseif vert == 'bottom' then
-			panel.hideHeight = scr.geometry.height
+			panel.hideHeight = scr.geometry.height - beautiful.useless_gap - buffer
 			panel.revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
 		end
 
@@ -110,25 +139,33 @@ function M.create(args)
 		end
 
 		if vert == 'bottom' and panel.open then
-			panel.y = panel.hideHeight
+			--panel.y = panel.hideHeight
 		end
+		]]--
 	end
 
-	function panel:animator(barIdx)
+	function panel:animator()
+		local scr = awful.screen.focused()
 		return rubato.timed {
-			duration = 0.25,
+			duration = 0.4,
 			rate = 120,
 			override_dt = true,
 			subscribed = function(p)
-				if panel.hideWidth then
-					panel.x = p
-				else
-					panel.y = p
+				local shape = args.fakeShape or util.rrect(args.radius or beautiful.radius)
+				panel.shape = function(cr, w, h)
+					shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
+					if args.growPosition == 'bottom' then
+						local change = scr.geometry.height - beautiful.useless_gap - accumBars(args.growPosition) - (h * (p/100))
+						if math.floor(change) ~= math.floor(panel.y) then
+							panel.y = math.floor(change)
+							panel:emit_signal 'widget::redraw_needed'
+							print(panel.y)
+						end
+					end
+					panel:emit_signal 'widget::redraw_needed'
 				end
 
-				if panel.hideHeight and p == panel.hideHeight then
-					panel.visible = false
-				elseif panel.hideWidth and p == panel.hideWidth then
+				if p == 0 then
 					panel.visible = false
 				end
 
@@ -136,43 +173,46 @@ function M.create(args)
 					panel:revealed()
 				end
 			end,
-			pos = panel.open and (panel.hideHeight and panel.hideHeight or panel.hideWidth) or (panel.revealHeight and panel.revealHeight or panel.revealWidth)
+			pos = panel.open and 0 or 100
 		}
 	end
 
-	function panel:toggle(barIdx)
+	function panel:toggle()
+		--if panel.screen ~= awful.screen.focused() then panel.open = false end
 		if panel.open then
-			panel:off(barIdx)
+			panel:off()
 		else
-			panel:on(barIdx)
+			panel:on()
 		end
+		panel.screen = awful.screen.focused()
 	end
 
-	function panel:on(barIdx)
+	function panel:on()
 		panel.open = true
 		local oldHeight = panel.height
 		panel:resize()
-		panel:align(barIdx, oldHeight)
+		panel:align(oldHeight)
 
 		if panel.manage then
 			panel:manage(panel.open)
 		end
 
 		local animator = panel:animator()
-		animator.target = panel.revealHeight and panel.revealHeight or panel.revealWidth
+		animator.target = 100
 		panel.visible = true
 	end
 
-	function panel:off(barIdx)
+	function panel:off()
 		panel.open = false
-		panel:align(barIdx)
+		--panel:resize()
+		--panel:align()
 
 		if panel.manage then
 			panel:manage(panel.open)
 		end
 
 		local animator = panel:animator()
-		animator.target = panel.hideHeight and panel.hideHeight or panel.hideWidth
+		animator.target = 0
 	end
 
 	return panel

@@ -268,7 +268,7 @@ startMenu = panels.create {
 								button {
 									icon = 'logout',
 									size = util.dpi(32),
-									click = power.shutdown
+									click = power.logout
 								},
 								button {
 									icon = 'restart',
@@ -356,7 +356,8 @@ startMenu = panels.create {
 	end,
 	height = menuHeight,
 	width = menuWidth,
-	growPosition = 'top'
+	growPosition = 'top',
+	attach = 'bottom_left'
 }
 
 command.add {
