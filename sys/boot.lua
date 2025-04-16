@@ -2,7 +2,6 @@ local initialized = awesome.get_xproperty 'initialized'
 if initialized then return end
 
 local awful = require 'awful'
-local beautiful = require 'beautiful'
 local gears = require 'gears'
 local rubato = require 'libs.rubato'
 local wibox = require 'wibox'
@@ -13,8 +12,8 @@ local scr = screen.primary
 local loading = wibox.widget {
 	widget = wibox.widget.slider,
 	bar_shape = gears.shape.rounded_rect,
-	bar_color = beautiful.backgroundSecondary,
-	handle_color = beautiful.accent,
+	bar_color = '#18181c',
+	handle_color = '#ffffff',
 	handle_shape = gears.shape.rounded_rect,
 	handle_width = util.dpi(scr.geometry.width / 25),
 }
@@ -32,7 +31,7 @@ local splash = wibox {
 			spacing = util.dpi(24),
 			icon {
 				icon = 'fedora',
-				color = beautiful.accent,
+				color = '#ffffff',
 				size = util.dpi(scr.geometry.width / 12)
 			},
 			{
