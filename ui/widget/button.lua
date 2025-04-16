@@ -2,7 +2,6 @@ local awful = require 'awful'
 local beautiful = require 'beautiful'
 local gtable = require 'gears.table'
 local gears = require 'gears'
-local makeup = require 'ui.makeup'
 local shape = require 'gears.shape'
 local util = require 'sys.util'
 
@@ -35,7 +34,8 @@ return function(icon, opts)
 		strategy = 'exact',
 		{
 			id = 'bg',
-			widget = makeup.putOn(background, {bg = opts.bgcolor or opts.bg}, {wibox = opts.parentWibox}),
+			--widget = makeup.putOn(background, {bg = opts.bgcolor or opts.bg}, {wibox = opts.parentWibox}),
+			widget = background,
 			shape = opts.shape or (opts.text and util.rrect(6) or gears.shape.circle),
 			{
 				widget = margin,
@@ -55,15 +55,12 @@ return function(icon, opts)
 								widget = constraint,
 								width = opts.size and opts.size + 2 or util.dpi(18),
 								{
-									widget = makeup.putOn(imagebox, function()
-										return {
-											stylesheet = string.format([[
-												* {
-													fill: %s;
-												}
-											]], util.beautyVar(opts.makeup or opts.color))
+									widget = imagebox,
+									stylesheet = string.format([[
+										* {
+											fill: %s;
 										}
-									end),
+									]], util.beautyVar(opts.makeup or opts.color)),
 									image = gears.filesystem.get_configuration_dir() .. '/assets/icons/' .. opts.icon .. '.svg',
 									id = 'icon'
 								},
@@ -120,7 +117,7 @@ return function(icon, opts)
 				end
 			elseif k == 'text' then
 				ico:get_children_by_id'textbox'[1].markup = util.colorizeText(v, util.beautyVar(opts.textColor or opts.color))
-			elseif k == 'onClick' and type(v) == 'function' then
+			elseif (k == 'onClick' or k == 'click') and type(v) == 'function' then
 				realWid.buttons = {
 					awful.button({}, 1, function()
 						v(realWid)
@@ -135,6 +132,7 @@ return function(icon, opts)
 	realWid.buttons = {
 		awful.button({}, 1, function()
 			if opts.onClick then opts.onClick(realWid) end
+			if opts.click then opts.click(realWid) end
 		end),
 	}
 

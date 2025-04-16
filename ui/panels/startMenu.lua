@@ -7,12 +7,15 @@ local lgi = require 'lgi'
 local Gio = lgi.Gio
 
 local util = require 'sys.util'
+local power = require 'sys.power'
 local extrautils = require 'libs.extrautils'()
 local fzy = require 'fzy'
 
 local titlebar = require 'ui.widget.titlebar'
 local panels = require 'ui.panels'
 local textbox = require 'ui.widget.textbox'
+local button = require 'ui.widget.button'
+local icon = require 'ui.widget.icon'
 local startMenu
 
 local apps = {}
@@ -125,7 +128,8 @@ local function fetchApps()
 		return iter
 	end
 
-	for app in pairsByKeys(allApps, function(a, b)
+	local first = true
+	for app, t in pairsByKeys(allApps, function(a, b)
 		return string.lower(a.name) < string.lower(b.name)
 	end) do
 		local name = app.name
@@ -148,6 +152,7 @@ local function fetchApps()
 				{
 					widget = wibox.container.margin,
 					margins = util.dpi(8),
+					top = util.dpi(first and -4 or 8),
 					{
 						layout = wibox.layout.fixed.horizontal,
 						spacing = util.dpi(8),
@@ -194,6 +199,7 @@ local function fetchApps()
 				}
 			}
 		}
+		first = false
 
 		appWid.buttons = {
 			awful.button({}, 1, function()
@@ -202,7 +208,7 @@ local function fetchApps()
 		}
 
 		function appWid:launch()
-			startMenu:toggle()
+			startMenu:off()
 			app.launch()
 			resetSearch()
 		end
@@ -229,63 +235,113 @@ startMenu = panels.create {
 			widget = wibox.container.margin,
 			margins = util.dpi(16),
 			{
-				layout = wibox.layout.stack,
+				layout = wibox.layout.fixed.horizontal,
+				spacing = util.dpi(16),
 				{
-					layout = wibox.container.margin,
-					bottom = searchHeight,
+					widget = wibox.container.background,
+					shape = util.rrect(beautiful.radius),
+					--bg = beautiful.backgroundTertiary,
 					{
 						layout = wibox.layout.stack,
 						{
 							layout = wibox.container.place,
-							halign = 'right',
-							forced_width = util.dpi(10),
-							{
-								widget = wibox.container.constraint,
-								width = util.dpi(10),
-								{
-									widget = wibox.container.margin,
-									{
-										widget = wibox.widget.separator,
-										color = beautiful.backgroundTertiary,
-										shape = gears.shape.rounded_bar,
-									}
-								}
+							halign = 'center',
+							valign = 'top',
+							icon {
+								icon = 'fedora',
+								size = util.dpi(32),
 							}
 						},
-						appList,
-					}
-				},
-				{
-					layout = wibox.container.margin,
-					right = util.dpi(12),
-					{
-						widget = wibox.container.background,
-						bg = {
-							type  = 'linear',
-							from  = {menuWidth, 0},
-							to = {menuWidth, menuHeight - (searchHeight / 1.5) - util.dpi(beautiful.titlebarHeight)},
-							stops = {
-								{0, beautiful.panelBackground .. '00'},
-								{0.8, beautiful.panelBackground .. '00'},
-								{0.88, beautiful.panelBackground .. 'cc'},
-								{0.9, beautiful.panelBackground},
+						{
+							layout = wibox.container.place,
+							halign = 'center',
+							valign = 'bottom',
+							{
+								layout = wibox.layout.fixed.vertical,
+								spacing = util.dpi(8),
+								button {
+									icon = 'sleep',
+									size = util.dpi(32),
+									click = power.sleep
+								},
+								button {
+									icon = 'logout',
+									size = util.dpi(32),
+									click = power.shutdown
+								},
+								button {
+									icon = 'restart',
+									size = util.dpi(32),
+									click = power.reboot
+								},
+								button {
+									icon = 'power2',
+									size = util.dpi(32),
+									click = power.shutdown
+								}
 							}
 						}
 					}
 				},
 				{
-					layout = wibox.container.place,
-					valign = 'bottom',
-					halign = 'center',
+					layout = wibox.layout.stack,
 					{
-						layout = wibox.container.constraint,
-						strategy = 'exact',
-						height = searchHeight,
-						width = menuWidth,
+						layout = wibox.container.margin,
+						bottom = searchHeight,
 						{
 							layout = wibox.layout.stack,
-							searchInputPlaceholder,
-							searchInput,
+							{
+								layout = wibox.container.place,
+								halign = 'right',
+								forced_width = util.dpi(10),
+								{
+									widget = wibox.container.constraint,
+									width = util.dpi(10),
+									{
+										widget = wibox.container.margin,
+										{
+											widget = wibox.widget.separator,
+											color = beautiful.backgroundTertiary,
+											shape = gears.shape.rounded_bar,
+										}
+									}
+								}
+							},
+							appList,
+						}
+					},
+					{
+						layout = wibox.container.margin,
+						right = util.dpi(12),
+						{
+							widget = wibox.container.background,
+							bg = {
+								type  = 'linear',
+								from  = {menuWidth, 0},
+								to = {menuWidth, menuHeight - (searchHeight / 1.5) - util.dpi(beautiful.titlebarHeight)},
+								stops = {
+									{0, beautiful.panelBackground .. '00'},
+									{0.8, beautiful.panelBackground .. '00'},
+									{0.88, beautiful.panelBackground .. 'cc'},
+									{0.9, beautiful.panelBackground},
+								}
+							}
+						}
+					},
+					{
+						layout = wibox.container.place,
+						valign = 'bottom',
+						halign = 'center',
+						{
+							layout = wibox.container.constraint,
+							strategy = 'exact',
+							height = searchHeight,
+							width = menuWidth,
+							{
+								layout = wibox.layout.stack,
+								searchInputPlaceholder,
+								searchInput,
+							}
 						}
 					}
 				}
@@ -299,6 +355,7 @@ startMenu = panels.create {
 	end,
 	height = menuHeight,
 	width = menuWidth,
+	growPosition = 'top'
 }
 
 return startMenu
