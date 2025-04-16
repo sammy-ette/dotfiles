@@ -52,8 +52,12 @@ settings.defineType('bars', {
 	}
 })
 
-require 'sys.theme'
 require 'sys.boot'
+require 'sys.theme'
+local compositor = require 'sys.compositor'
+if true then
+	compositor.on()
+end
 
 local command = require 'sys.command'
 command.defaults()

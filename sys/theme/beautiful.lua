@@ -29,5 +29,7 @@ beautiful.init(gears.table.crush({
 	notificationHeight = util.dpi(120),
 
 	systray_icon_spacing = util.dpi(5),
-	bg_systray = palette.backgroundTertiary
+	bg_systray = palette.backgroundTertiary,
+
+	clientShape = util.rrect(12)
 }, palette))

@@ -2,6 +2,8 @@ local awful = require 'awful'
 local gears = require 'gears'
 local ruled = require 'ruled'
 local extrautils = require 'libs.extrautils'()
+local compositor = require 'sys.compositor'
+local beautiful = require 'beautiful'
 
 ruled.client.connect_signal('request::rules', function()
 	ruled.client.append_rule {
@@ -37,6 +39,14 @@ local function restrictHeight(c)
 	end
 end
 
+function setShape(c, doShape)
+	if not doShape then
+		c.shape = nil
+	elseif beautiful.clientShape then
+		c.shape = beautiful.clientShape
+	end
+end
+
 client.connect_signal('manage', function(c)
 	restrictHeight(c)
 	if not awesome.startup then awful.client.setslave(c) end
@@ -59,9 +69,42 @@ client.connect_signal('manage', function(c)
 		cr:paint()
 		c.icon = img._native
 	end
+
+	setShape(c, not compositor.running)
+	
 end)
 
 client.connect_signal('request::geometry', function(c)
 	restrictHeight(c)
 	awful.placement.no_offscreen(c)
+
+	local scr = c.screen
+	if not scr then return end
+
+	local geom = c:geometry()
+	if geom.width >= scr.geometry.width and geom.height >= scr.geometry.height then
+		setShape(c, false)
+	end
+end)
+
+awesome.connect_signal('compositor::off', function()
+	for _, c in ipairs(client.get()) do
+		if not c.fullscreen then
+			c.shape = beautiful.clientShape
+		end
+	end
+end)
+
+awesome.connect_signal('compositor::on', function()
+	for _, c in ipairs(client.get()) do
+		c.shape = nil
+	end
+end)
+
+client.connect_signal('property::fullscreen', function(c)
+	if c.fullscreen then
+		c.shape = nil
+	else
+		c.shape = compositor.state() and nil or beautiful.clientShape
+	end
 end)
