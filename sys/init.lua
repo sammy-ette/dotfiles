@@ -21,6 +21,14 @@ settings.defineType('theme', {
 	type = 'dark'
 })
 
+settings.migrate('theme', {
+	version = 2,
+	migrator = function(conf)
+		conf.accent = 'color6'
+		--conf.set('accent', 'color6')
+	end
+})
+
 settings.defineType('bars', {
 	{
 		screen = 'all',

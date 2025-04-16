@@ -10,7 +10,7 @@ local palette = palettes[themeSettings.name .. ':' .. themeSettings.type]
 local fontName = 'IBM Plex Sans'
 
 beautiful.init(gears.table.crush({
-	accent = palette.color6,
+	accent = palette[themeSettings.accent],
 
 	fontName = fontName,
 	font = fontName .. ' Regular 12',

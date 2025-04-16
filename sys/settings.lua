@@ -34,6 +34,10 @@ function M.defineType(name, schema)
 		config = json.decode(content)
 	end
 
+	if not config.__version then
+		config.__version = 1
+	end
+
 	M.confs[name] = {
 		fileHandle = file,
 		config = config
@@ -41,7 +45,10 @@ function M.defineType(name, schema)
 end
 
 function M.write(configName)
-	M.confs[configName].fileHandle:replace_contents_bytes_async(GLib.Bytes(json.encode(M.confs[configName].config)), nil, false, Gio.FileCreateFlags.REPLACE_DESTINATION, nil, function(_, res) file:replace_contents_finish(res) end)
+	local file = M.confs[configName].fileHandle
+	file:replace_contents_bytes_async(GLib.Bytes(json.encode(M.confs[configName].config)), nil, false, Gio.FileCreateFlags.REPLACE_DESTINATION, nil, function(_, res)
+		file:replace_contents_finish(res)
+	end)
 end
 
 function M.set(configName, key, val, write)
@@ -51,14 +58,33 @@ end
 
 
 function M.getConfig(configName)
-	return M.confs[configName].config
+	local conf = M.confs[configName].config
+	local confWrap = {}
+	setmetatable(confWrap, {
+		__index = function(_, k)
+			return conf[k]
+		end,
+		__newindex = function(_, k, v)
+			M.set(configName, k, v)
+		end
+	})
+
+	return confWrap
 end
 
 function M.get(configName, key)
 	return M.confs[configName].config[key]
 end
 
--- TODO: MIGRATE FUNCTION
 -- to migrate to the latest config schema
+function M.migrate(configName, opts)
+	local conf = M.getConfig(configName)
+	if conf.__version > opts.version or conf.__version == opts.version then return end
+
+	print(string.format('migrating %s from ver %d to %d', configName, conf.__version, opts.version))
+	opts.migrator(conf)
+	conf.__version = opts.version
+	M.write(configName)
+end
 
 return M
