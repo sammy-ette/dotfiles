@@ -54,8 +54,15 @@ settings.defineType('bars', {
 
 require 'sys.boot'
 require 'sys.theme'
+
 local compositor = require 'sys.compositor'
-if true then
+
+settings.defineType('compositor', {
+	enabled = true
+})
+
+local comp = settings.getConfig 'compositor'
+if comp.enabled then
 	compositor.on()
 end
 
