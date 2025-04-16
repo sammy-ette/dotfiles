@@ -180,6 +180,12 @@ for i = 1, 9 do
 		key = 'M-' .. tostring(i),
 		action = 'tag:go-to-' .. tostring(i)
 	})
+
+	table.insert(keyTable, {
+		group = 'management',
+		key = 'M-S-' .. tostring(i),
+		action = 'client:move-to-' .. tostring(i)
+	})
 end
 
 settings.defineType('keys', keyTable)
@@ -222,13 +228,13 @@ local clientKeyBinds = {}
 
 local otherBind = false
 for _, def in ipairs(keyDefs) do
+	if def.action == 'system:start-menu' then goto continue end
 	local modifiers, key, mouse = parseKey(def.key)
 	local keyHandler = function(...)
-		local success = command.perform(def.action, {modifiers = modifiers, key = key})
+		local success = command.perform(def.action, {modifiers = modifiers, key = key, extras = {...}})
 		--print(def.action)
 		--print(success)
 	end
-	print(modifiers[1], key)
 	local awfulKey = awful.key {
 		modifiers = modifiers,
 		key = key and tostring(key) or key,
@@ -240,7 +246,7 @@ for _, def in ipairs(keyDefs) do
 			if otherBind then
 				otherBind = false
 			else
-				print(modifiers[1], key, 'released')
+				--print(modifiers[1], key, 'released')
 				--if otherBind then return end
 				keyHandler(...)
 			end
@@ -264,7 +270,10 @@ for _, def in ipairs(keyDefs) do
 
 	if def.group == 'client' then
 		if mouse then
-			table.insert(clientMouseBinds, awful.button(modifiers, key, keyHandler))
+			table.insert(clientMouseBinds, awful.button(modifiers, key, function(...)
+				otherBind = true
+				keyHandler(...)
+			end))
 		else
 			table.insert(clientKeyBinds, awfulKey)
 		end
@@ -273,6 +282,7 @@ for _, def in ipairs(keyDefs) do
 			awfulKey
 		}
 	end
+	::continue::
 end
 
 client.connect_signal('request::default_mousebindings', function()
