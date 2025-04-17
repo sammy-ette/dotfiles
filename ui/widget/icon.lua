@@ -1,7 +1,6 @@
 local beautiful = require 'beautiful'
 local gears = require 'gears'
 local gtable = require 'gears.table'
-local makeup = require 'ui.makeup'
 local util = require 'sys.util'
 
 local constraint = require 'wibox.container.constraint'

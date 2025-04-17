@@ -11,7 +11,7 @@ local place = require 'wibox.container.place'
 
 local background = require 'wibox.container.background'
 local constraint = require 'wibox.container.constraint'
-local icon = require 'ui.widgets.icon'
+local icon = require 'ui.widget.icon'
 local imagebox = require 'wibox.widget.imagebox'
 local textbox = require 'wibox.widget.textbox'
 local widget = require 'wibox.widget'
