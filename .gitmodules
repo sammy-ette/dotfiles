@@ -10,3 +10,6 @@
 [submodule "libs/switcher"]
 	path = libs/switcher
 	url = https://github.com/troglobit/awesome-switcher
+[submodule "libs/awexygen"]
+	path = libs/awexygen
+	url = https://github.com/xinhaoyuan/awexygen
