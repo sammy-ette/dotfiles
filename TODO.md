@@ -11,3 +11,7 @@ to add new defaults without impacting already stored values~~
 
 # Wallpaper
 - ~~Use a default wallpaper if the current set wallpaper is missing (to avoid error)~~
+
+# Etc..
+Delete .bin except for screenshot related scripts. or maybe migrate it to awesome,
+actually
