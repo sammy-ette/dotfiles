@@ -58,6 +58,9 @@ if not awesome.__isPaperbushApp then
 	require 'sys.client'
 	require 'sys.autostart'
 	require 'sys.signal'
+
+	local apps = require 'sys.apps'
+	apps.register 'settings'
 end
 
 local command = require 'sys.command'

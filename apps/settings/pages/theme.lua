@@ -34,8 +34,8 @@ local function restrict(w)
 end
 
 page.add {
-	name = 'Wallpaper',
-	icon = 'wallpaper',
+	name = 'Theme',
+	icon = 'palette',
 	widget = {
 		pageWidgets.section('Wallpaper', {
 			pageWidgets.subsection('Home', {

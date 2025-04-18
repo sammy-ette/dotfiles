@@ -1,1 +1,1 @@
-require 'apps.settings.pages.wallpaper'
+require 'apps.settings.pages.theme'

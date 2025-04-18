@@ -6,7 +6,7 @@ local M = {
 }
 
 function M.register(name)
-	table.insert(M.names, name)
+	M.names[name] = true
 end
 
 function M.run(name)
@@ -15,7 +15,9 @@ function M.run(name)
 	end
 
 	local confDir = gears.filesystem.get_configuration_dir()
-	awful.spawn.easy_async(string.format('%slibs/awexygen/awexygen %sapps/%s/init.lua', confDir, name, confDir), function() end)
+	local cmd = string.format('cd %s && %slibs/awexygen/awexygen %sapps/%s/init.lua', confDir, confDir, confDir, name)
+	print(cmd)
+	awful.spawn.easy_async(cmd, function() end)
 end
 
 function M.init()
