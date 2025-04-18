@@ -15,3 +15,4 @@ to add new defaults without impacting already stored values~~
 # Etc..
 Delete .bin except for screenshot related scripts. or maybe migrate it to awesome,
 actually
+- make fzy optional
