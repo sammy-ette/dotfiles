@@ -192,7 +192,7 @@ local function fetchApps()
 									{
 										widget = textbox,
 										color = beautiful.foregroundSecondary,
-										text = app.description
+										text = gears.string.xml_escape(app.description)
 									}
 								} or nil
 							}
