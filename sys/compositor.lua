@@ -1,5 +1,6 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
+local gears = require 'gears'
 
 awesome.register_xproperty('picomPid', 'number')
 
@@ -22,7 +23,7 @@ end
 
 function M.on()
 	awesome.emit_signal 'compositor::on'
-	local pid = awful.spawn.easy_async(string.format('picom', os.getenv 'USER', beautiful.picom_conf), function()
+	local pid = awful.spawn.easy_async(string.format('picom --config %s.dist/picom.conf', gears.filesystem.get_configuration_dir()), function()
 		if M.awesomeKill then
 			awesome.emit_signal 'compositor::off'
 			M.awesomeKill = false
