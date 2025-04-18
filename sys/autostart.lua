@@ -1,6 +1,6 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
-local compositor = require 'modules.compositor'
+local compositor = require 'sys.compositor'
 local settings = require 'sys.settings'
 local naughty = require 'naughty'
 local sound = require 'sys.sound'
