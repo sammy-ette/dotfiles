@@ -8,6 +8,7 @@ local Gio = lgi.Gio
 
 local util = require 'sys.util'
 local power = require 'sys.power'
+local sysApp = require 'sys.apps'
 local command = require 'sys.command'
 local extrautils = require 'libs.extrautils'()
 local fzy = require 'fzy'
@@ -133,7 +134,7 @@ local function fetchApps()
 	for app, t in pairsByKeys(allApps, function(a, b)
 		return string.lower(a.name) < string.lower(b.name)
 	end) do
-		local name = app.name
+		local name = gears.string.xml_escape(app.name)
 		if collision[name] or not app.show then
 			goto continue
 		end
@@ -211,7 +212,6 @@ local function fetchApps()
 		function appWid:launch()
 			startMenu:off()
 			app.launch()
-			resetSearch()
 		end
 
 		--helpers.displayClickable(appWid, {bg = bgcolor})
@@ -248,9 +248,21 @@ startMenu = panels.create {
 							layout = wibox.container.place,
 							halign = 'center',
 							valign = 'top',
-							icon {
-								icon = 'fedora',
-								size = util.dpi(32),
+							{
+								layout = wibox.layout.fixed.vertical,
+								spacing = util.dpi(8),
+								icon {
+									icon = 'fedora',
+									size = util.dpi(32),
+								},
+								button {
+									icon = 'settings',
+									size = util.dpi(32),
+									click = function()
+										sysApp.run 'settings'
+										startMenu:off()
+									end
+								}
 							}
 						},
 						{
@@ -360,6 +372,11 @@ startMenu = panels.create {
 	attach = 'bottom_left'
 }
 
+local oldOff = startMenu.off
+function startMenu:off(...)
+	resetSearch()
+	oldOff(...)
+end
 command.add {
 	name = 'system:start-menu',
 	action = function()
