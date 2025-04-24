@@ -114,6 +114,11 @@ local keyTable = {
 	},
 	{
 		group = 'screen',
+		key = 'C-A-Print',
+		action = 'screen:all-screenshot'
+	},
+	{
+		group = 'screen',
 		key = 'C-Print',
 		action = 'screen:selection-screenshot'
 	},
@@ -122,7 +127,6 @@ local keyTable = {
 		key = 'Print',
 		action = 'screen:window-screenshot'
 	},
-
 	{
 		group = 'utility',
 		key = 'M-t',
