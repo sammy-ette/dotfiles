@@ -111,40 +111,67 @@ function M.create(args)
 			--honor_workarea = true,
 			--honor_padding = true
 		})
-		--[[
-		if alignment == 'left' then
-			local buffer = 0
-			local scr = awful.screen.focused()
-			for _, bar in ipairs(scr.bar) do
-				if bar.position == 'top' or bar.position == 'bottom' then
-					buffer = buffer + bar.height
+
+		if args.method == 'pos' then
+			if alignment == 'left' then
+				local buffer = 0
+				local scr = awful.screen.focused()
+				for _, bar in ipairs(scr.bar) do
+					if bar.position == 'top' or bar.position == 'bottom' then
+						buffer = buffer + bar.height
+					end
 				end
+				panel.y = beautiful.useless_gap
 			end
-			panel.y = beautiful.useless_gap
-		end
 
-		local buffer = barIdx and scr.bar[barIdx].height or 0
-		--local hideHeight, revealHeight
-		if vert == 'top' then
-			panel.hideHeight = -args.height
-			panel.revealHeight = beautiful.useless_gap + buffer
-		elseif vert == 'bottom' then
-			panel.hideHeight = scr.geometry.height - beautiful.useless_gap - buffer
-			panel.revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
-		end
+			local buffer = barIdx and scr.bar[barIdx].height or 0
+			--local hideHeight, revealHeight
+			if vert == 'top' then
+				panel.hideHeight = -args.height
+				panel.revealHeight = beautiful.useless_gap + buffer
+			elseif vert == 'bottom' then
+				panel.hideHeight = scr.geometry.height - beautiful.useless_gap - buffer
+				panel.revealHeight = scr.geometry.height - args.height - beautiful.useless_gap - buffer
+			end
 
-		if alignment == 'left' then
-			panel.hideWidth = -args.width
-			panel.revealWidth = beautiful.useless_gap + buffer
-		end
+			if alignment == 'left' then
+				panel.hideWidth = -args.width
+				panel.revealWidth = beautiful.useless_gap + buffer
+			end
 
-		if vert == 'bottom' and panel.open then
-			--panel.y = panel.hideHeight
+			if vert == 'bottom' and panel.open then
+				--panel.y = panel.hideHeight
+			end
 		end
-		]]--
 	end
 
 	function panel:animator()
+		if args.method == 'pos' then
+			return rubato.timed {
+				duration = 0.25,
+				rate = 120,
+				override_dt = true,
+				subscribed = function(p)
+					if panel.hideWidth then
+						panel.x = p
+					else
+						panel.y = p
+					end
+
+					if panel.hideHeight and p == panel.hideHeight then
+						panel.visible = false
+					elseif panel.hideWidth and p == panel.hideWidth then
+						panel.visible = false
+					end
+
+					if panel.open and p == panel.revealHeight and panel.revealed then
+						panel:revealed()
+					end
+				end,
+				pos = panel.open and (panel.hideHeight and panel.hideHeight or panel.hideWidth) or (panel.revealHeight and panel.revealHeight or panel.revealWidth)
+			}
+		end
+
 		local scr = awful.screen.focused()
 		return rubato.timed {
 			duration = 0.4,
@@ -198,7 +225,11 @@ function M.create(args)
 		end
 
 		local animator = panel:animator()
-		animator.target = 100
+		if args.method == 'pos' then
+			animator.target = panel.revealHeight and panel.revealHeight or panel.revealWidth
+		else
+			animator.target = 100
+		end
 		panel.visible = true
 	end
 
@@ -212,7 +243,11 @@ function M.create(args)
 		end
 
 		local animator = panel:animator()
-		animator.target = 0
+		if args.method == 'pos' then
+			animator.target = panel.hideHeight and panel.hideHeight or panel.hideWidth
+		else
+			animator.target = 0
+		end
 	end
 
 	return panel

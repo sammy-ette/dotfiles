@@ -59,6 +59,7 @@ local briefNotif = panels.create {
 	fakeShape = util.rrect(14),
 	width = briefInitSize,
 	height = briefInitSize,
+	method = 'pos',
 	widget = {
 		widget = wibox.container.margin,
 		--margins = util.dpi(6),
