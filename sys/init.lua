@@ -52,6 +52,8 @@ if not awesome.__isPaperbushApp then
 	local comp = settings.getConfig 'compositor'
 	if comp.enabled then
 		compositor.on()
+	else
+		compositor.off()
 	end
 	require 'sys.keys'
 	require 'sys.layout'
