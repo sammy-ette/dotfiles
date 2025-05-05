@@ -13,3 +13,6 @@
 [submodule "libs/awexygen"]
 	path = libs/awexygen
 	url = https://github.com/xinhaoyuan/awexygen
+[submodule "libs/bling"]
+	path = libs/bling
+	url = https://github.com/Aproxia-dev/bling

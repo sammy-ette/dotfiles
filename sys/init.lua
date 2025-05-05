@@ -28,7 +28,9 @@ settings.defineType('bars', {
 				'workspace',
 				'apps'
 			},
-			center = {},
+			center = {
+				'music'
+			},
 			right = {
 				'systray',
 				'capslock',
