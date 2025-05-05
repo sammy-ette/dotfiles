@@ -16,7 +16,7 @@ end
 
 local path = args[1]
 -- URL to uplaod to
-local url = 'https://safe.kashima.moe/api/upload'
+local url = 'https://yuki.suou.moe/api/upload'
 -- Authentication Key
 -- You should change this to a value that makes sense for you
 local authpath = string.format('%s/%s', hilbish.home, '.apikey')
@@ -29,7 +29,7 @@ local filearray = true
 local image = 'url'
 local headers = {
 	Accept = 'application/vnd.chibisafe.json',
-	Token = authtoken:gsub('\n', '')
+	['x-api-key'] = authtoken:gsub('\n', '')
 }
 
 local headerstr = ''
