@@ -226,6 +226,14 @@ fetchApps()
 local menuHeight = util.dpi(580)
 local menuWidth = util.dpi(460)
 local searchHeight = util.dpi(32)
+
+local function hideAndFunc(fun)
+	return function(...)
+		startMenu:off()
+		fun(...)
+	end
+end
+
 startMenu = panels.create {
 	widget = {
 		layout = wibox.layout.fixed.vertical,
@@ -262,6 +270,11 @@ startMenu = panels.create {
 										sysApp.run 'settings'
 										startMenu:off()
 									end
+								},
+								button {
+									icon = 'paperbush-reset',
+									size = util.dpi(32),
+									click = hideAndFunc(awesome.restart)
 								}
 							}
 						},
@@ -275,22 +288,22 @@ startMenu = panels.create {
 								button {
 									icon = 'sleep',
 									size = util.dpi(32),
-									click = power.sleep
+									click = hideAndFunc(power.sleep)
 								},
 								button {
 									icon = 'logout',
 									size = util.dpi(32),
-									click = power.logout
+									click = hideAndFunc(power.logout)
 								},
 								button {
 									icon = 'restart',
 									size = util.dpi(32),
-									click = power.reboot
+									click = hideAndFunc(power.reboot)
 								},
 								button {
 									icon = 'power2',
 									size = util.dpi(32),
-									click = power.shutdown
+									click = hideAndFunc(power.shutdown)
 								}
 							}
 						}
