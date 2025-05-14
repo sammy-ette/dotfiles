@@ -107,7 +107,7 @@ local briefNotifAnimator = rubato.timed {
 		briefMargin.margins = briefMargins * scale
 		briefTitle.opacity = scale
 		briefMessage.opacity = scale
-		briefNotif:align(nil, true)
+		briefNotif:align(true)
 	end,
 	pos = briefInitSize,
 	easing = rubato.easing.quadratic
@@ -212,7 +212,7 @@ naughty.connect_signal('request::display', function(notification)
 	if fullscreenClient then
 		briefIcon.icon = category or 'notification'
 		briefTitle.text = notification.title
-		briefMessage.text = notification.text
+		briefMessage.text = notification.text:gsub('(.+)%.(.+)%.(.+)\n\n', ''):gsub('\n', ' ')
 		briefNotify()
 		return
 	end
