@@ -51,6 +51,13 @@ client.connect_signal('manage', function(c)
 	restrictHeight(c)
 	if not awesome.startup then awful.client.setslave(c) end
 
+	if c.sticky then
+		c.floating = true
+		c.focusable = false
+		c.ontop = true
+		--c.above = true
+	end
+
 	if c.maximized and not c.fullscreen then
 		awful.placement.maximize(c, {
 			honor_padding = true,
