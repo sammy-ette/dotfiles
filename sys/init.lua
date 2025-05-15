@@ -32,6 +32,7 @@ settings.defineType('bars', {
 				'music'
 			},
 			right = {
+				'battery',
 				'systray',
 				'capslock',
 				'time',
@@ -62,6 +63,7 @@ if not awesome.__isPaperbushApp then
 	require 'sys.client'
 	require 'sys.autostart'
 	require 'sys.signal'
+	require 'sys.battery'
 
 	local apps = require 'sys.apps'
 	apps.register 'settings'
@@ -69,5 +71,3 @@ end
 
 local command = require 'sys.command'
 command.defaults()
-
-

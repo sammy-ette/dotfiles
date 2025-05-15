@@ -37,7 +37,7 @@ local animator = rubato.timed {
 	rate = 120,
 	override_dt = true,
 	subscribed = function(p)
-		print 'sex'
+		--print 'sex'
 		local shape = util.rrect(beautiful.radius)
 		wid.shape = function(cr, w, h)
 			print(w, h)
