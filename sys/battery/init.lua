@@ -116,7 +116,6 @@ end
 --if M.profile() == 'powerSave' then settings.noAnimate = true end
 
 function M.history(updater)
-	--[[
 	local sparkline = p.Proxy:new {
 		bus = p.Bus.SESSION,
 		name = 'party.sammyette.Sparkline',
@@ -138,9 +137,6 @@ function M.history(updater)
 	end, 'Update')
 
 	return history
-	]]--
-
-	return {}
 end
 
 return M
