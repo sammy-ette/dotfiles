@@ -62,6 +62,19 @@ function M.create(args)
 		end
 	end
 
+	local function parseAlignments()
+		local alignment, vert
+		if args.attach == 'mouse' then
+			local mc = mouse.coords()
+			alignment, vert = locateQuadrant(mc.x, mc.y)
+		else
+			alignment = args.attach
+			vert = args.attach:match '([%w]+)'
+		end
+
+		return alignment, vert
+	end
+
 	function panel:align(reposition)
 		if reposition then
 		elseif panel.revealHeight then
@@ -89,14 +102,7 @@ function M.create(args)
 			return table.concat({vertAlign, horizAlign}, '_'), vertAlign, horizAlign
 		end
 
-		local alignment, vert
-		if args.attach == 'mouse' then
-			local mc = mouse.coords()
-			alignment, vert = locateQuadrant(mc.x, mc.y)
-		else
-			alignment = args.attach
-			vert = args.attach:match '([%w]+)'
-		end
+		local alignment, vert = parseAlignments()
 		if not args.growPosition then
 			args.growPosition = vert
 		end
@@ -173,6 +179,8 @@ function M.create(args)
 		end
 
 		local scr = awful.screen.focused()
+		local gears = require 'gears'
+		local _, vert = parseAlignments()
 		return rubato.timed {
 			duration = 0.4,
 			rate = 120,
@@ -180,7 +188,14 @@ function M.create(args)
 			subscribed = function(p)
 				local shape = args.fakeShape or util.rrect(args.radius or beautiful.radius)
 				panel.shape = function(cr, w, h)
-					shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
+					-- so, overriding the shape variable causes the draw to lag behind the shape anim.. for some reason
+					-- so it has to be local.
+					if vert == 'bottom' then
+						local shape = gears.shape.transform(shape):scale(1, -1):translate(0, -h)
+						shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
+					else
+						shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
+					end
 					if args.growPosition == 'bottom' then
 						local change = scr.geometry.height - beautiful.useless_gap - accumBars(args.growPosition) - (h * (p/100))
 						if math.floor(change) ~= math.floor(panel.y) then
