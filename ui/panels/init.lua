@@ -265,6 +265,12 @@ function M.create(args)
 		end
 	end
 
+	client.connect_signal('button::press', function()
+		if panel.open then
+			panel:off()
+		end
+	end)
+
 	return panel
 end
 
