@@ -15,7 +15,7 @@ function M.run(name)
 	end
 
 	local confDir = gears.filesystem.get_configuration_dir()
-	local cmd = string.format('cd %s && %slibs/awexygen/awexygen %sapps/%s/init.lua', confDir, confDir, confDir, name)
+	local cmd = string.format('sh -c "cd %s && %slibs/awexygen/awexygen %sapps/%s/init.lua"', confDir, confDir, confDir, name)
 	print(cmd)
 	awful.spawn.easy_async(cmd, function() end)
 end
