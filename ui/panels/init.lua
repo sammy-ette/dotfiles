@@ -4,6 +4,7 @@ local wibox = require 'wibox'
 local util = require 'sys.util'
 local settings = require 'sys.settings'
 local rubato = require 'libs.rubato'
+local focus = require 'sys.focus'
 
 local M = {}
 
@@ -265,7 +266,7 @@ function M.create(args)
 		end
 	end
 
-	client.connect_signal('button::press', function()
+	focus.autoHide(function()
 		if panel.open then
 			panel:off()
 		end

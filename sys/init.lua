@@ -64,6 +64,7 @@ if not awesome.__isPaperbushApp then
 	require 'sys.autostart'
 	require 'sys.signal'
 	require 'sys.battery'
+	require 'sys.focus'
 
 	local apps = require 'sys.apps'
 	apps.register 'settings'
