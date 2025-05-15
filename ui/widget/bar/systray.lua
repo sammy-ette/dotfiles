@@ -14,6 +14,7 @@ return function(scr)
 	local expandIcon = icon {
 		icon = 'expand-more',
 	}
+
 	systray:set_base_size(util.dpi(18))
 	local open = false
 	local w = wibox.widget {
@@ -48,7 +49,7 @@ return function(scr)
 		}
 	}
 
-	systray.visible = false
+	systray.visible = true
 
 	local animator = rubato.timed {
 		duration = 0.5,
@@ -62,15 +63,30 @@ return function(scr)
 		end
 	}
 
+	systray.visible = true
+
 	local iconSize = util.dpi(18)
+	local function setWidgetSize()
+		if awesome.systray() ~= 0 then
+			local expandWidth = baseSize + (iconSize * awesome.systray()) + (beautiful.systray_icon_spacing * awesome.systray())
+			systray.forced_width = expandWidth
+			animator.target = expandWidth
+		end
+	end
+
+	systray:connect_signal('widget::layout_changed', function()
+		if open then
+			setWidgetSize()
+		end
+	end)
+
 	w.buttons = {
 		awful.button({}, 1, function()
 			--systray:emit_signal 'systray::update'
 			print(awesome.systray())
 			if not open then
 				systray.forced_height = util.dpi(18)
-				systray.forced_width = baseSize + (iconSize * (awesome.systray() + 1))
-				animator.target = baseSize + (iconSize * (awesome.systray() + 1))
+				setWidgetSize()
 				systray.visible = true
 				expandIcon.icon = 'expand-less'
 			else
