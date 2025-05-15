@@ -21,7 +21,9 @@ for idx, barSetup in ipairs(bars) do
 		}
 		startMenuActivator.buttons = {
 			awful.button({}, 1, function()
-				startMenu:toggle(barIdx)
+				startMenu:toggle {
+					context = 'mouse'
+				}
 				--startMenu:toggle()
 			end)
 		}

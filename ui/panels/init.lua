@@ -31,6 +31,7 @@ function M.create(args)
 
 	args.attach = args.attach or 'mouse'
 	args.growHeight = args.growHeight == nil and true or args.growHeight
+	args.growPosition = args.growPosition or 'auto'
 	--args.invertShrink = true
 
 	local panel = wibox {
@@ -62,50 +63,52 @@ function M.create(args)
 		end
 	end
 
+	local scr = awful.screen.focused()
+	local function locateQuadrant(x, y)
+		local isTop = y < (scr.geometry.height / 3)
+		print('isTop', isTop)
+		local isLeft = x < (scr.geometry.width / 3)
+		print('isLeft', isLeft)
+		local isCenterY = y > (scr.geometry.height / 3) and y < ((scr.geometry.height / 3) * 2)
+		local isCenterX = x > (scr.geometry.width / 3) and x < ((scr.geometry.width / 3) * 2)
+		--print 'center y, centerx, y, x'
+		--print(isCenterY, isCenterX, y, x)
+		local vertAlign = (isTop and 'top' or 'bottom')
+		local horizAlign = (isLeft and 'left' or 'right')
+
+		if isCenterY then
+			vertAlign = nil
+		end
+		if isCenterX then
+			horizAlign = nil
+		end
+
+		return table.concat({vertAlign, horizAlign}, '_'), vertAlign, horizAlign
+	end
+
 	local function parseAlignments()
-		local alignment, vert
+		print(args.attach, args.startMenu)
+		local alignment, vert, horiz
 		if args.attach == 'mouse' then
 			local mc = mouse.coords()
-			alignment, vert = locateQuadrant(mc.x, mc.y)
+			alignment, vert, horiz = locateQuadrant(mc.x, mc.y)
 		else
 			alignment = args.attach
 			vert = args.attach:match '([%w]+)'
+			horiz = args.attach:match '_([%w]+)'
 		end
+		print(alignment)
 
-		return alignment, vert
+		return alignment, vert, horiz
 	end
 
 	function panel:align(reposition)
 		if reposition then
-		elseif panel.revealHeight then
+		elseif args.method == 'pos' and panel.revealHeight then
 			return
 		end
 
-		local scr = awful.screen.focused()
-		local function locateQuadrant(x, y)
-			local isTop = y < (scr.geometry.height / 3)
-			local isLeft = x < (scr.geometry.width / 3)
-			local isCenterY = y > (scr.geometry.height / 3) and y < ((scr.geometry.height / 3) * 2)
-			local isCenterX = x > (scr.geometry.width / 3) and x < ((scr.geometry.width / 3) * 2)
-			--print 'center y, centerx, y, x'
-			--print(isCenterY, isCenterX, y, x)
-			local vertAlign = (isTop and 'top' or 'bottom')
-			local horizAlign = (isLeft and 'left' or 'right')
-
-			if isCenterY then
-				vertAlign = nil
-			end
-			if isCenterX then
-				horizAlign = nil
-			end
-
-			return table.concat({vertAlign, horizAlign}, '_'), vertAlign, horizAlign
-		end
-
 		local alignment, vert = parseAlignments()
-		if not args.growPosition then
-			args.growPosition = vert
-		end
 		awful.placement.align(panel, {
 			position = alignment,
 			margins = {
@@ -117,6 +120,7 @@ function M.create(args)
 			--honor_workarea = true,
 			--honor_padding = true
 		})
+		panel.alignment = alignment
 
 		if args.method == 'pos' then
 			if alignment == 'left' then
@@ -190,19 +194,12 @@ function M.create(args)
 				panel.shape = function(cr, w, h)
 					-- so, overriding the shape variable causes the draw to lag behind the shape anim.. for some reason
 					-- so it has to be local.
-					if vert == 'bottom' then
+					print(args.growPosition)
+					if (args.growPosition == 'auto' and vert == 'bottom') or args.growPosition == 'bottom' then
 						local shape = gears.shape.transform(shape):scale(1, -1):translate(0, -h)
 						shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
 					else
 						shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
-					end
-					if args.growPosition == 'bottom' then
-						local change = scr.geometry.height - beautiful.useless_gap - accumBars(args.growPosition) - (h * (p/100))
-						if math.floor(change) ~= math.floor(panel.y) then
-							panel.y = math.floor(change)
-							panel:emit_signal 'widget::redraw_needed'
-							print(panel.y)
-						end
 					end
 					panel:emit_signal 'widget::redraw_needed'
 				end
@@ -219,21 +216,24 @@ function M.create(args)
 		}
 	end
 
-	function panel:toggle()
+	function panel:toggle(opts)
 		--if panel.screen ~= awful.screen.focused() then panel.open = false end
 		if panel.open then
-			panel:off()
+			panel:off(opts)
 		else
-			panel:on()
+			panel:on(opts)
 		end
 		panel.screen = awful.screen.focused()
 	end
 
-	function panel:on()
+	function panel:on(opts)
+		opts = opts or {}
 		panel.open = true
 		local oldHeight = panel.height
 		panel:resize()
-		panel:align(oldHeight)
+		if opts.context and opts.context == 'mouse' and args.attach == 'mouse' then
+			panel:align()
+		end
 
 		if panel.manage then
 			panel:manage(panel.open)

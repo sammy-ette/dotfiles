@@ -381,10 +381,9 @@ startMenu = panels.create {
 	end,
 	height = menuHeight,
 	width = menuWidth,
-	growPosition = 'top',
-	attach = 'bottom_left'
+	--attach = 'bottom_left'
+	attach = 'mouse',
 }
-
 local oldOff = startMenu.off
 function startMenu:off(...)
 	resetSearch()
