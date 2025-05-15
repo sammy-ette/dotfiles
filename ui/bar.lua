@@ -34,19 +34,19 @@ for idx, barSetup in ipairs(bars) do
 			apps = require 'ui.widget.bar.apps'(screen),
 			workspace = require 'ui.widget.bar.workspace'(screen),
 			systray = require 'ui.widget.bar.systray'(screen),
-			layout = require 'ui.widget.bar.layout'(screen),
+			--layout = require 'ui.widget.bar.layout'(screen),
 			music = require 'ui.widget.bar.music',
 			battery = require 'ui.widget.bar.battery',
 			volume = require 'ui.widget.bar.volume',
 		}
 		for _, moduleName in ipairs(barSetup.modules[position]) do
 			local module = moduleList[moduleName]
-			if not module then
+			if module then
+				table.insert(widgets, module)
+			else
 				-- TODO: warning notification
-				return
 			end
 
-			table.insert(widgets, module)
 		end
 
 		return {

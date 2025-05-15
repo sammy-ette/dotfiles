@@ -3,6 +3,7 @@ local beautiful = require 'beautiful'
 local wibox = require 'wibox'
 
 local workspacePanel = require 'ui.panels.workspaces'
+local layoutIndicator = require 'ui.widget.bar.layout'
 local util = require 'sys.util'
 
 return function(scr)
@@ -15,8 +16,13 @@ return function(scr)
 		bg = beautiful.backgroundTertiary,
 		{
 			layout = wibox.container.margin,
-			margins = util.dpi(6),
-			indicator
+			margins = util.dpi(8),
+			{
+				layout = wibox.layout.fixed.horizontal,
+				spacing = util.dpi(6),
+				layoutIndicator(scr),
+				indicator
+			}
 		}
 	}
 	w.buttons = {
