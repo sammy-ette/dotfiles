@@ -4,7 +4,7 @@ local GLib = lgi.GLib
 local gears = require 'gears'
 local json = require 'libs.json'
 
-local baseConfigDir = gears.filesystem.get_xdg_data_home() .. 'paperbush/'
+local baseConfigDir = (os.getenv 'PAPERBUSH_CONFIG_DIR' or gears.filesystem.get_xdg_data_home() .. 'paperbush') .. '/'
 Gio.File.new_for_path(baseConfigDir):make_directory()
 
 local M = {
