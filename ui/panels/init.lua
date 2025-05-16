@@ -67,9 +67,7 @@ function M.create(args)
 	local scr = awful.screen.focused()
 	local function locateQuadrant(x, y)
 		local isTop = y < (scr.geometry.height / 3)
-		print('isTop', isTop)
 		local isLeft = x < (scr.geometry.width / 3)
-		print('isLeft', isLeft)
 		local isCenterY = y > (scr.geometry.height / 3) and y < ((scr.geometry.height / 3) * 2)
 		local isCenterX = x > (scr.geometry.width / 3) and x < ((scr.geometry.width / 3) * 2)
 		--print 'center y, centerx, y, x'
@@ -77,18 +75,20 @@ function M.create(args)
 		local vertAlign = (isTop and 'top' or 'bottom')
 		local horizAlign = (isLeft and 'left' or 'right')
 
+		local alignTable = {vertAlign, horizAlign}
 		if isCenterY then
 			vertAlign = nil
+			alignTable = {horizAlign}
 		end
 		if isCenterX then
 			horizAlign = nil
+			alignTable = {vertAlign}
 		end
 
-		return table.concat({vertAlign, horizAlign}, '_'), vertAlign, horizAlign
+		return table.concat(alignTable, '_'), vertAlign, horizAlign
 	end
 
 	local function parseAlignments()
-		print(args.attach, args.startMenu)
 		local alignment, vert, horiz
 		if args.attach == 'mouse' then
 			local mc = mouse.coords()
@@ -98,7 +98,6 @@ function M.create(args)
 			vert = args.attach:match '([%w]+)'
 			horiz = args.attach:match '_([%w]+)'
 		end
-		print(alignment)
 
 		return alignment, vert, horiz
 	end
@@ -195,7 +194,6 @@ function M.create(args)
 				panel.shape = function(cr, w, h)
 					-- so, overriding the shape variable causes the draw to lag behind the shape anim.. for some reason
 					-- so it has to be local.
-					print(args.growPosition)
 					if (args.growPosition == 'auto' and vert == 'bottom') or args.growPosition == 'bottom' then
 						local shape = gears.shape.transform(shape):scale(1, -1):translate(0, -h)
 						shape(cr, args.growWidth and w * (p/100) or w, args.growHeight and h * (p/100) or h)
