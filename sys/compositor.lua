@@ -10,15 +10,8 @@ local M = {
 	pid = awesome.get_xproperty 'picomPid'
 }
 
-
-awful.spawn.easy_async('pgrep picom', function(output)
-	if output ~= '' then
-		M.running = true
-	end
-end)
-
-function M.state()
-	return M.running
+if M.pid then
+	M.running = true
 end
 
 function M.on()
@@ -39,25 +32,28 @@ end
 
 function M.off()
 	M.awesomeKill = true
-	if M.pid and M.pid ~= -1 then
+	if M.pid then
 		awful.spawn.easy_async(string.format('kill %d', M.pid), function() end)
 		M.running = false
-		M.setPid(-1)
+		M.setPid(nil)
 	end
 
 	return false
 end
 
 function M.toggle(on)
-	if not M.running or on then
+	print(M.running, M.pid)
+	if not M.running then
+		print 'turning on compositor'
 		return M.on()
 	else
+		print 'turning off compositor'
 		return M.off()
 	end
 end
 
 function M.setPid(pid)
-	if pid ~= -1 then
+	if pid then
 		awesome.set_xproperty('picomPid', pid)
 	end
 	M.pid = pid
