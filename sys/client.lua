@@ -58,6 +58,10 @@ client.connect_signal('manage', function(c)
 		--c.above = true
 	end
 
+	if not c.maximized and not c.fullscreen then
+		awful.placement.centered(c, {parent = c.transient_for or c.screen or awful.screen.focused()})
+	end
+
 	if c.maximized and not c.fullscreen then
 		awful.placement.maximize(c, {
 			honor_padding = true,
