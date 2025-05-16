@@ -15,17 +15,17 @@ if M.pid then
 end
 
 function M.on()
-	awesome.emit_signal 'compositor::on'
 	local pid = awful.spawn.easy_async(string.format('picom --config %s.dist/picom.conf', gears.filesystem.get_configuration_dir()), function()
 		if M.awesomeKill then
 			awesome.emit_signal 'compositor::off'
 			M.awesomeKill = false
 			return
 		end
-		M.on(true)
+		M.on()
 	end)
 	M.running = true
 	M.setPid(pid)
+	awesome.emit_signal 'compositor::on'
 
 	return true
 end
@@ -42,7 +42,6 @@ function M.off()
 end
 
 function M.toggle(on)
-	print(M.running, M.pid)
 	if not M.running then
 		print 'turning on compositor'
 		return M.on()
