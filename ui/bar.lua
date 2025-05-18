@@ -38,6 +38,7 @@ for idx, barSetup in ipairs(bars) do
 			music = require 'ui.widget.bar.music',
 			battery = require 'ui.widget.bar.battery',
 			volume = require 'ui.widget.bar.volume',
+			quickSettings = require 'ui.widget.bar.quickSettings'
 		}
 		for _, moduleName in ipairs(barSetup.modules[position]) do
 			local module = moduleList[moduleName]

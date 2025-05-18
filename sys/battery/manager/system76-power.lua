@@ -19,8 +19,11 @@ function M.balancedProfile()
 	proxy:Balanced()
 end
 
-function M.profile()
+function M.profile(pretty)
 	local profile = proxy:GetProfile()
+	if pretty then
+		return profile == 'Battery' and 'Power Saver' or profile
+	end
 
 	if profile == 'Battery' then return 'powerSave' end
 	if profile == 'Balanced' then return 'balanced' end

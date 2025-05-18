@@ -1,5 +1,5 @@
-local gfs = require 'gears.filesystem'
 local settings = require 'sys.settings'
+local gfs = require 'gears.filesystem'
 require 'awful.autofocus'
 
 -- Initialize settings stores
@@ -39,6 +39,15 @@ settings.defineType('bars', {
 				'layout'
 			}
 		}
+	}
+})
+
+settings.defineType('quickSettings', {
+	modules = {
+		--'wifi',
+		--'bluetooth'
+		'battery',
+		'compositor'
 	}
 })
 

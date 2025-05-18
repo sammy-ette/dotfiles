@@ -230,12 +230,16 @@ function M.create(args)
 		panel.open = true
 		local oldHeight = panel.height
 		panel:resize()
-		if opts.context and opts.context == 'mouse' and args.attach == 'mouse' then
+		if args.attach == 'mouse' then
+			if opts.context and opts.context == 'mouse' then
+				panel:align()
+			end
+		else
 			panel:align()
 		end
 
-		if panel.manage then
-			panel:manage(panel.open)
+		if args.manage then
+			args.manage(panel, panel.open)
 		end
 
 		local animator = panel:animator()
@@ -252,8 +256,8 @@ function M.create(args)
 		--panel:resize()
 		--panel:align()
 
-		if panel.manage then
-			panel:manage(panel.open)
+		if args.manage then
+			args.manage(panel, panel.open)
 		end
 
 		local animator = panel:animator()

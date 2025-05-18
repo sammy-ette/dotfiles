@@ -109,8 +109,8 @@ function M.setProfile(profile)
 	manager[profile .. 'Profile']()
 end
 
-function M.profile()
-	return manager.profile()
+function M.profile(pretty)
+	return manager.profile(pretty)
 end
 
 --if M.profile() == 'powerSave' then settings.noAnimate = true end
@@ -124,11 +124,18 @@ function M.history(updater)
 	}
 
 	local historyRaw = sparkline:Collect(battery:get_object_path())
+	local historyIdxSorted = {}
+	for k in pairs(historyRaw) do table.insert(historyIdxSorted, k) end
+	table.sort(historyIdxSorted)
+
 	local history = {}
 
-	for k, hist in pairs(historyRaw) do
-		table.insert(history, hist[1])
-		table.sort(history, function(a, b) return a > b end)
+	for _, k in pairs(historyIdxSorted) do
+		local hist = historyRaw[k]
+		if history[#history] ~= hist[1] then
+			print(k, hist, hist[1], 'sparkline history')
+			table.insert(history, hist[1])
+		end
 	end
 
 	sparkline:connect_signal(function(_, data)

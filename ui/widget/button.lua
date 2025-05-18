@@ -16,30 +16,27 @@ local imagebox = require 'wibox.widget.imagebox'
 local textbox = require 'wibox.widget.textbox'
 local widget = require 'wibox.widget'
 
-return function(icon, opts)
-	local opts = opts or {}
-	if type(icon) == 'table' then
-		opts = icon
-	else
-		opts.icon = icon
-	end
-
+return function(opts)
+	assert(opts, 'button opts are required')
+	assert(opts.icon, 'button icon is required')
 	opts.color = opts.color or 'foreground'
+	print(opts.bg, opts.containerHeight)
 
 	local focused = false
 	local ico = widget {
 		layout = constraint,
-		height = opts.height,
-		width = opts.height,
+		height = opts.containerHeight or opts.height,
+		width = opts.containerWidth or opts.width,
 		strategy = 'exact',
 		{
 			id = 'bg',
 			--widget = makeup.putOn(background, {bg = opts.bgcolor or opts.bg}, {wibox = opts.parentWibox}),
 			widget = background,
+			bg = opts.bg,
 			shape = opts.shape or (opts.text and util.rrect(6) or gears.shape.circle),
 			{
 				widget = margin,
-				margins = opts.margin or opts.margins or util.dpi(2),
+				--margins = opts.margin or opts.margins or util.dpi(2),
 				{
 					layout = place,
 					halign = opts.align or 'center',
@@ -66,13 +63,13 @@ return function(icon, opts)
 								},
 							},
 						} or nil,
-						{
+						opts.text and {
 							widget = textbox,
 							markup = util.colorizeText(opts.text or '', util.beautyVar(opts.textColor or opts.color)),
 							font = opts.font or beautiful.font:gsub('%d+$', opts.fontSize or 14),
 							id = 'textbox',
 							valign = 'center'
-						}
+						} or nil
 					}
 				}
 			}

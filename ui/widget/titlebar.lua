@@ -27,9 +27,13 @@ function new(opts)
 				left = util.dpi(16), right = util.dpi(16),
 				{
 					layout = wibox.layout.align.horizontal,
-					spacing = util.dpi(8),
-					opts.before,
-					titleText,
+					{
+						layout = wibox.layout.fixed.horizontal,
+						spacing = util.dpi(8),
+						opts.before,
+						titleText,
+					},
+					nil,
 					opts.after
 				}
 			}
