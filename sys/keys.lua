@@ -8,6 +8,11 @@ local command = require 'sys.command'
 local keyTable = {
 	{
 		group = 'system',
+		key = 'RightMouse',
+		action = 'system:right-click-menu'
+	},
+	{
+		group = 'system',
 		key = 'M-S-/',
 		action = 'system:display-keys'
 	},

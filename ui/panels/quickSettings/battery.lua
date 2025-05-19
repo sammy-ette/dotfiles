@@ -6,7 +6,9 @@ local battery = require 'sys.battery'
 local icon = require 'ui.widget.icon'
 local textbox = require 'ui.widget.textbox'
 local linegraph = require 'ui.widget.linegraph'
+local dropdown = require 'ui.widget.dropdown'
 local util = require 'sys.util'
+local menu = require 'ui.menu'
 
 local M = gears.object {
 	class = {
@@ -84,6 +86,13 @@ awesome.connect_signal('battery::time', function(t, timeNum)
 	time.text = t
 end)
 
+local function profileSwitch(name)
+	return function()
+		print('setting profile', name)
+		battery.setProfile(name)
+	end
+end
+
 local powerProfile = wibox.widget {
 	layout = wibox.layout.align.horizontal,
 	{
@@ -102,17 +111,28 @@ local powerProfile = wibox.widget {
 	},
 	nil,
 	{
-		widget = wibox.layout.fixed.horizontal,
-		{
-			widget = textbox,
-			text = battery.profile(true),
-			font = beautiful.fontName .. ' SemiBold 12',
-			color = beautiful.foregroundSecondary
-		},
-		icon {
-			icon = 'expand-more',
-			color = beautiful.foregroundSecondary,
-			size = util.dpi(24)
+		widget = dropdown,
+		text = battery.profile(true),
+		font = beautiful.fontName .. ' SemiBold 12',
+		color = beautiful.foregroundSecondary,
+		items = {
+			{
+				{
+					icon = 'leaf',
+					text = 'Power Saver',
+					onClick = profileSwitch 'powerSave'
+				},
+				{
+					icon = 'balanced',
+					text = 'Balanced',
+					onClick = profileSwitch 'balanced'
+				},
+				{
+					icon = 'bolt',
+					text = 'Performance',
+					onClick = profileSwitch 'performance'
+				},
+			}
 		}
 	}
 }
