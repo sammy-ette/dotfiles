@@ -236,17 +236,23 @@ for _, def in ipairs(keyDefs) do
 	local modifiers, key, mouse = parseKey(def.key)
 	local keyHandler = function(...)
 		local success = command.perform(def.action, {modifiers = modifiers, key = key, extras = {...}})
-		--print(def.action)
-		--print(success)
 	end
-	local awfulKey = awful.key {
-		modifiers = modifiers,
-		key = key and tostring(key) or key,
-		description = def.description or (command.get(def.action) and command.get(def.action) or {}).description,
-		group = def.group,
-	}
+	local keyAssign
+	if mouse then
+		keyAssign = awful.button {
+			modifiers = modifiers,
+			button = key,
+		}
+	else
+		keyAssign = awful.key {
+			modifiers = modifiers,
+			key = key and tostring(key) or key,
+			description = def.description or (command.get(def.action) and command.get(def.action) or {}).description,
+			group = def.group,
+		}
+	end
 	if def.release then
-		awfulKey.on_release = function(...)
+		keyAssign.on_release = function(...)
 			if otherBind then
 				otherBind = false
 			else
@@ -256,17 +262,17 @@ for _, def in ipairs(keyDefs) do
 			end
 		end
 		--[[
-		awfulKey.on_press = function()
+		keyAssign.on_press = function()
 			print(modifiers[1], key, 'pressed')
 		end
 		]]--
 	else
-		awfulKey.on_press = function(...)
+		keyAssign.on_press = function(...)
 			--print(modifiers[1], key, 'pressed')
 			otherBind = true
 			keyHandler(...)
 		end
-		awfulKey.on_release = function()
+		keyAssign.on_release = function()
 			otherBind = true
 			--print(modifiers[1], key, 'released')
 		end
@@ -274,17 +280,16 @@ for _, def in ipairs(keyDefs) do
 
 	if def.group == 'client' then
 		if mouse then
-			table.insert(clientMouseBinds, awful.button(modifiers, key, function(...)
-				otherBind = true
-				keyHandler(...)
-			end))
+			table.insert(clientMouseBinds, keyAssign)
 		else
-			table.insert(clientKeyBinds, awfulKey)
+			table.insert(clientKeyBinds, keyAssign)
 		end
 	else
-		awful.keyboard.append_global_keybindings {
-			awfulKey
-		}
+		if mouse then
+			awful.mouse.append_global_mousebinding(keyAssign)
+		else
+			awful.keyboard.append_global_keybinding(keyAssign)
+		end
 	end
 	::continue::
 end
