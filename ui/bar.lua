@@ -152,7 +152,6 @@ for idx, barSetup in ipairs(bars) do
 
 				revealerBar:connect_signal('mouse::enter', function()
 					showBar()
-					print 'revealing the details'
 				end)
 				bar:connect_signal('mouse::enter', function()
 					hideTimer:stop()
