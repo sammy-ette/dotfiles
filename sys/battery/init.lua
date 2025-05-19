@@ -134,7 +134,7 @@ function M.history(updater)
 		local hist = historyRaw[k]
 		if history[#history] ~= hist[1] then
 			print(k, hist, hist[1], 'sparkline history')
-			table.insert(history, hist[1])
+			table.insert(history, 1, hist[1])
 		end
 	end
 
