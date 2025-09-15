@@ -116,12 +116,16 @@ end
 --if M.profile() == 'powerSave' then settings.noAnimate = true end
 
 function M.history(updater)
-	local sparkline = p.Proxy:new {
-		bus = p.Bus.SESSION,
-		name = 'party.sammyette.Sparkline',
-		interface = 'party.sammyette.Sparkline',
-		path = '/party/sammyette/Sparkline'
-	}
+	local sparkline = pcall(function()
+		return p.Proxy:new {
+			bus = p.Bus.SESSION,
+			name = 'party.sammyette.Sparkline',
+			interface = 'party.sammyette.Sparkline',
+			path = '/party/sammyette/Sparkline'
+		}
+	end)
+
+	if not sparkline then return {} end
 
 	local historyRaw = sparkline:Collect(battery:get_object_path())
 	local historyIdxSorted = {}
