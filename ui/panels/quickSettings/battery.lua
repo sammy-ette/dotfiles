@@ -6,7 +6,7 @@ local battery = require 'sys.battery'
 local icon = require 'ui.widget.icon'
 local textbox = require 'ui.widget.textbox'
 local linegraph = require 'ui.widget.linegraph'
-local dropdown = require 'ui.widget.dropdown'
+--local dropdown = require 'ui.widget.dropdown'
 local util = require 'sys.util'
 local menu = require 'ui.menu'
 
@@ -110,7 +110,7 @@ local powerProfile = wibox.widget {
 		}
 	},
 	nil,
-	{
+	--[[{
 		widget = dropdown,
 		text = battery.profile(true),
 		font = beautiful.fontName .. ' SemiBold 12',
@@ -134,7 +134,7 @@ local powerProfile = wibox.widget {
 				},
 			}
 		}
-	}
+	}]]--
 }
 
 local batteryGraph = linegraph {

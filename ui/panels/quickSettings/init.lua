@@ -8,6 +8,7 @@ local rubato = require 'libs.rubato'
 
 local icon = require 'ui.widget.icon'
 local button = require 'ui.widget.button'
+local splitButton = require 'ui.widget.button-split'
 local titlebar = require 'ui.widget.titlebar'
 
 local quickSettingsLayout = wibox.layout.overflow.horizontal()
@@ -33,7 +34,10 @@ local qsBeforeButton = wibox.widget {
 		size = util.dpi(24),
 		onClick = function()
 			animator.target = -quickSettingsWidth
-		end
+		end,
+		style = {
+			bg = beautiful.shade2
+		}
 	}
 }
 
@@ -45,9 +49,15 @@ local quickSettingsTitlebar, qstHeight = titlebar {
 		spacing = util.dpi(12),
 		button {
 			icon = 'edit',
+			style = {
+				bg = beautiful.shade2
+			}
 		},
 		button {
 			icon = 'settings',
+			style = {
+				bg = beautiful.shade2
+			}
 		}
 	}
 }
@@ -138,19 +148,11 @@ local function createToggler(args)
 		halign = 'center'
 	}
 
-	local toggleButton = button {
-		icon = togglerInitOptions.icon,
-		color = beautiful.background,
-		shape = gears.shape.rectangle,
-		containerHeight = util.dpi(100),
-		size = util.dpi(28),
-		onClick = quickSettingsModule.toggle
-	}
-
 	local page = togglerInitOptions.page
 	if quickSettingsModule.page then
 		page = quickSettingsModule.page()
 	end
+
 	local quickSettingsPage = wibox.widget {
 		layout = wibox.container.constraint,
 		width = quickSettingsWidth - (quickSettingsMargins * 2),
@@ -162,30 +164,35 @@ local function createToggler(args)
 		}
 	}
 
-	local open = false
-	local togglerPageButton = button {
-		icon = 'arrow-right',
+	local buttonFactory = page and splitButton or button
+
+	local toggleButton = buttonFactory {
+		icon = togglerInitOptions.icon,
+		iconSize = util.dpi(32),
 		color = beautiful.background,
-		shape = gears.shape.rectaxngle,
+		shape = gears.shape.rectangle,
 		containerHeight = util.dpi(100),
-		size = util.dpi(20),
-		onClick = function()
+		size = util.dpi(28),
+		click = quickSettingsModule.toggle,
+		type = 'toggle',
+		style = {
+			bg = beautiful.backgroundTertiary
+		},
+		menuClick = function()
 			quickSettingsLayout:set(2, quickSettingsPage)
 			quickSettingsLayout:emit_signal 'widget::layout_changed'
 			quickSettingsPage.visible = true
 			animator.target = quickSettingsWidth
 		end
 	}
-
-	local togglerBg = wibox.container.background()
 	local function setTogglerBackground(on)
-		togglerBg.bg = on and beautiful.accent or beautiful.backgroundTertiary
-		toggleButton.color = on and beautiful.background or beautiful.foregroundSecondary
+		toggleButton.style = {
+			bg = on and beautiful.accent or beautiful.backgroundTertiary
+		}
+		--toggleButton.color = on and beautiful.background or beautiful.foregroundSecondary
 	end
 	setTogglerBackground(togglerInitOptions.on)
 
-	local togglerRatio = wibox.layout.ratio.horizontal()
-	--togglerRatio.spacing = util.dpi(1)
 	local togglerWidget = wibox.widget {
 		layout = wibox.layout.fixed.vertical,
 		spacing = util.dpi(8),
@@ -193,21 +200,10 @@ local function createToggler(args)
 			layout = wibox.container.constraint,
 			height = util.dpi(58),
 			strategy = 'exact',
-			{
-				widget = togglerBg,
-				shape = util.rrect(beautiful.radius * 2),
-				{
-					layout = togglerRatio,
-					toggleButton,
-					page and togglerPageButton or nil
-				}
-			}
+			toggleButton
 		},
 		togglerLabel
 	}
-
-	local majorTogglerSize = 0.75
-	togglerRatio:adjust_ratio(1, 0, majorTogglerSize, 1 - majorTogglerSize)
 
 	local toggles = quickSettingsHome:get_children_by_id 'toggles'[1]
 	toggles:add(togglerWidget)

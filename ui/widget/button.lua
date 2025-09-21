@@ -1,137 +1,108 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
-local gtable = require 'gears.table'
 local gears = require 'gears'
-local shape = require 'gears.shape'
 local util = require 'sys.util'
+local wibox = require 'wibox'
+local rubato = require 'libs.rubato'
 
-local fixed = require 'wibox.layout.fixed'
-local margin = require 'wibox.container.margin'
-local place = require 'wibox.container.place'
-
-local background = require 'wibox.container.background'
-local constraint = require 'wibox.container.constraint'
 local icon = require 'ui.widget.icon'
-local imagebox = require 'wibox.widget.imagebox'
-local textbox = require 'wibox.widget.textbox'
-local widget = require 'wibox.widget'
 
-return function(opts)
-	assert(opts, 'button opts are required')
-	assert(opts.icon, 'button icon is required')
-	opts.color = opts.color or 'foreground'
-	print(opts.bg, opts.containerHeight)
+local button = {mt = {}}
 
-	local focused = false
-	local ico = widget {
-		layout = constraint,
-		height = opts.containerHeight or opts.height,
-		width = opts.containerWidth or opts.width,
+function button:set_click(fun)
+	self._private.click = fun
+end
+
+function button:get_click()
+	return self._private.click
+end
+
+function button:set_type(typ)
+	self._private.type = typ
+end
+
+function button:get_type(typ)
+	return self._private.type
+end
+
+function button:set_style(style)
+	self._private.style = style
+	self._private.widgets.background.bg = style.bg
+end
+
+function button:activate()
+	self._private.click()
+	self._private.state = not self._private.state
+
+	if self._private.type == 'normal' then return end
+	if self._private.type == 'toggle' then
+		if self.animator then
+			self.animator.target = self._private.state and beautiful.radius or 32
+		end
+		self._private.widgets.background.bg = self._private.state and self._private.style.active or self._private.style.bg
+	end
+end
+
+local function new(args)
+	args = args or {}
+	local ico = icon {
+		icon = args.icon or 'fedora',
+		size = args.iconSize
+	}
+
+	local background = wibox.container.background()
+
+	local ret = wibox.widget {
+		layout = wibox.container.constraint,
+		width = args.size or args.width,
+		height = args.size or args.height,
 		strategy = 'exact',
 		{
-			id = 'bg',
-			--widget = makeup.putOn(background, {bg = opts.bgcolor or opts.bg}, {wibox = opts.parentWibox}),
-			widget = background,
-			bg = opts.bg,
-			shape = opts.shape or (opts.text and util.rrect(6) or gears.shape.circle),
+
+			layout = background,
+			shape = args.shape or util.rrect(32),
 			{
-				widget = margin,
-				--margins = opts.margin or opts.margins or util.dpi(2),
-				{
-					layout = place,
-					halign = opts.align or 'center',
-					{
-						layout = fixed.horizontal,
-						spacing = util.dpi(4),
-						(opts.icon ~= '' and opts.icon ~= nil) and {
-							layout = place,
-							valign = 'center',
-							halign = 'center',
-							align = 'center',
-							{
-								widget = constraint,
-								width = opts.size and opts.size + 2 or util.dpi(18),
-								{
-									widget = imagebox,
-									stylesheet = string.format([[
-										* {
-											fill: %s;
-										}
-									]], util.beautyVar(opts.makeup or opts.color)),
-									image = gears.filesystem.get_configuration_dir() .. '/assets/icons/' .. opts.icon .. '.svg',
-									id = 'icon'
-								},
-							},
-						} or nil,
-						opts.text and {
-							widget = textbox,
-							markup = util.colorizeText(opts.text or '', util.beautyVar(opts.textColor or opts.color)),
-							font = opts.font or beautiful.font:gsub('%d+$', opts.fontSize or 14),
-							id = 'textbox',
-							valign = 'center'
-						} or nil
-					}
-				}
+				layout = wibox.container.place,
+				ico
 			}
 		}
 	}
-	--util.displayClickable(ico, opts)
 
-	local function setupIcon()
-		--ico:get_children_by_id'icon'[1].image = gears.color.recolor_image(ico:get_children_by_id'icon'[1].image, focused and beautiful.fg_normal .. 55 or beautiful.fg_normal)
-		ico:emit_signal 'widget::redraw_needed'
-	end
+	gears.table.crush(ret, button)
+	ret._private.widgets = {
+		background = background
+	}
+	ret._private.state = false
 
-	ico:connect_signal('mouse::enter', function()
-		focused = true
-		setupIcon()
-	end)
-	ico:connect_signal('mouse::leave', function()
-		focused = false
-		setupIcon()
-	end)
-
-	ico.visible = true
-	local realWid
-	realWid = setmetatable({}, {
-		__index = function(_, k)
-			return ico[k]
-		end,
-		__newindex = function(_, k, v)
-			if k == 'icon' then
-				ico:get_children_by_id'icon'[1].image = gears.color.recolor_image(gears.filesystem.get_configuration_dir() .. '/assets/icons/' .. v .. '.svg', beautiful.fg_normal)
-				ico:emit_signal 'widget::redraw_needed'
-			elseif k == 'color' then
-				local icon = ico:get_children_by_id'icon'[1]
-				opts.color = v
-				if icon then
-					icon.stylesheet = string.format([[
-						* {
-							fill: %s;
-						}
-					]], util.beautyVar(opts.iconColor or opts.color))
-					ico:emit_signal 'widget::redraw_needed'
-				end
-			elseif k == 'text' then
-				ico:get_children_by_id'textbox'[1].markup = util.colorizeText(v, util.beautyVar(opts.textColor or opts.color))
-			elseif (k == 'onClick' or k == 'click') and type(v) == 'function' then
-				realWid.buttons = {
-					awful.button({}, 1, function()
-						v(realWid)
-					end),
-				}
-			elseif k == 'makeup' then
-				opts.makeup = v
-			end
-			ico[k] = v
-		end
-	})
-	realWid.buttons = {
+	ret.click = args.click or args.onClick
+	ret.type = args.type or 'normal'
+	ret.style = args.style or {
+		bg = '#00000000',
+		active = beautiful.accent
+	}
+	ret.buttons = {
 		awful.button({}, 1, function()
-			if opts.onClick then opts.onClick(realWid) end
-			if opts.click then opts.click(realWid) end
-		end),
+			ret:activate()
+		end)
 	}
 
-	return realWid
+	if args.type == 'toggle' and not args.shape then
+		ret.animator = rubato.timed {
+			duration = 0.2,
+			rate = 120,
+			override_dt = true,
+			subscribed = function(rad)
+				ret._private.widgets.background.shape = util.rrect(rad)
+			end,
+			pos = 32
+		}
+	end
+
+	return ret
 end
+
+function button.mt:__call(args)
+    return new(args)
+end
+
+return setmetatable(button, button.mt)

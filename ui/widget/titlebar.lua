@@ -4,7 +4,7 @@ local util = require 'sys.util'
 
 local titlebar = {mt = {}}
 
-function new(opts)
+local function new(opts)
 	opts = opts or {}
 
 	local titleText = wibox.widget {
