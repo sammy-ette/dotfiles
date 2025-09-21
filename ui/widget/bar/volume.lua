@@ -1,6 +1,6 @@
-local battery = require 'ui.widget.volume'
+local volume = require 'ui.widget.volume'
 local util = require 'sys.util'
 
-return battery {
+return volume {
 	size = util.dpi(20)
 }

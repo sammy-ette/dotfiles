@@ -1,4 +1,6 @@
 local awful = require 'awful'
+local beautiful = require 'beautiful'
+local util = require 'sys.util'
 local icon = require 'ui.widget.icon'
 
 local volume = {mt = {}}
@@ -9,6 +11,10 @@ local function new(opts)
 		objects = {icon},
 		preferred_alignments = {'middle'},
 		mode = 'outside',
+		margins = util.dpi(4),
+		gaps = beautiful.useless_gap / 1.5,
+		bg = beautiful.backgroundSecondary,
+		fg = beautiful.foreground
 	}
 
 	local function setState(volume, muted, init)
