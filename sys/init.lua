@@ -35,6 +35,7 @@ settings.defineType('bars', {
 				'battery',
 				'systray',
 				'capslock',
+				'quickSettings',
 				'time',
 				'layout'
 			}
