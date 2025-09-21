@@ -50,7 +50,7 @@ local function new(args)
 		layout = wibox.layout.align.horizontal,
 		nil,
 		{
-			layout = wibox.layout.margin,
+			layout = wibox.container.margin,
 			right = util.dpi(4),
 			btn
 		},
