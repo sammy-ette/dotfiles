@@ -154,7 +154,7 @@ local function fetchApps()
 				{
 					widget = wibox.container.margin,
 					margins = util.dpi(8),
-					top = util.dpi(first and -4 or 8),
+					--top = util.dpi(first and -4 or 8),
 					{
 						layout = wibox.layout.fixed.horizontal,
 						spacing = util.dpi(8),
@@ -192,7 +192,7 @@ local function fetchApps()
 									{
 										widget = textbox,
 										color = beautiful.foregroundSecondary,
-										text = gears.string.xml_escape(app.description)
+										text = gears.string.xml_escape(app.description:gsub('&', 'and'))
 									}
 								} or nil
 							}
@@ -214,11 +214,12 @@ local function fetchApps()
 			app.launch()
 		end
 
-		--helpers.displayClickable(appWid, {bg = bgcolor})
+		util.displayClickable(appWid, {bg = beautiful.panelBackground})
 		appList:add(appWid)
 
 		::continue::
 	end
+	appList:add(icon {icon = 'fedora', size = util.dpi(24), color = beautiful.panelBackground})
 end
 
 fetchApps()
@@ -265,7 +266,7 @@ startMenu = panels.create {
 								},
 								button {
 									icon = 'settings',
-									size = util.dpi(32),
+									iconSize = util.dpi(24),
 									click = function()
 										sysApp.run 'settings'
 										startMenu:off()
@@ -273,7 +274,7 @@ startMenu = panels.create {
 								},
 								button {
 									icon = 'paperbush-reset',
-									size = util.dpi(32),
+									iconSize = util.dpi(24),
 									click = hideAndFunc(awesome.restart)
 								}
 							}
@@ -287,22 +288,22 @@ startMenu = panels.create {
 								spacing = util.dpi(8),
 								button {
 									icon = 'sleep',
-									size = util.dpi(32),
+									iconSize = util.dpi(24),
 									click = hideAndFunc(power.sleep)
 								},
 								button {
 									icon = 'logout',
-									size = util.dpi(32),
+									iconSize = util.dpi(24),
 									click = hideAndFunc(power.logout)
 								},
 								button {
 									icon = 'restart',
-									size = util.dpi(32),
+									iconSize = util.dpi(24),
 									click = hideAndFunc(power.reboot)
 								},
 								button {
 									icon = 'power2',
-									size = util.dpi(32),
+									iconSize = util.dpi(24),
 									click = hideAndFunc(power.shutdown)
 								}
 							}

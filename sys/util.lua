@@ -65,4 +65,27 @@ function M.beautyVar(var)
 	return var
 end
 
+function M.shiftColor(color, percent)
+	local num = tonumber(color:sub(2), 16)
+	local r = math.floor(num / 0x10000) + percent
+	local g = (math.floor(num / 0x100) % 0x100) + percent
+	local b = (num % 0x100) + percent
+
+	return string.format('%#x', clamp(r) * 0x10000 + clamp(g) * 0x100 + clamp(b)):gsub('0x', '#')
+end
+
+function M.displayClickable(widget, opts)
+	opts = opts or {}
+	opts.shiftFactor = opts.shiftFactor or 15
+	local bgWid = widget:get_children_by_id 'bg'[1]
+
+	widget:connect_signal('mouse::enter', function ()
+		bgWid.bg = M.shiftColor(opts.bg, opts.shiftFactor)
+	end)
+
+	widget:connect_signal('mouse::leave', function ()
+		bgWid.bg = opts.bg
+	end)
+end
+
 return M
