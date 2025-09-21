@@ -1,3 +1,4 @@
+local awful = require 'awful'
 local gears = require 'gears'
 local xr = require 'beautiful.xresources'
 
@@ -86,6 +87,10 @@ function M.displayClickable(widget, opts)
 	widget:connect_signal('mouse::leave', function ()
 		bgWid.bg = opts.bg
 	end)
+end
+
+function M.spawn(cmd, cb)
+	awful.spawn.easy_async(cmd, cb or function() end)
 end
 
 return M
