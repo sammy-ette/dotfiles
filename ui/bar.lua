@@ -71,7 +71,11 @@ for idx, barSetup in ipairs(bars) do
 					and wibox.layout.align.horizontal or wibox.layout.align.vertical,
 					expand = 'none',
 					moduleWidgets('left', idx, screen),
-					moduleWidgets('center', idx, screen),
+					{
+						widget = wibox.container.constraint,
+						width = screen.geometry.width / 3.5,
+						moduleWidgets('center', idx, screen)
+					},
 					moduleWidgets('right', idx, screen),
 				}
 			}
