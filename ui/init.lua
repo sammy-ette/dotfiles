@@ -4,6 +4,8 @@ require 'ui.titlebar'
 require 'ui.popup.all'
 require 'ui.notify'
 
+require 'ui.notifs.battery'
+
 local menu = require 'ui.menu'
 local m = menu.create {}
 m:setItems({
