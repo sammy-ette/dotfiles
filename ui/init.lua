@@ -23,7 +23,6 @@ local command = require 'sys.command'
 command.add {
 	name = 'system:right-click-menu',
 	action = function()
-		m:show()
+		m:toggle()
 	end
 }
-
