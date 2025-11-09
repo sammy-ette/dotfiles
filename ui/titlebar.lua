@@ -27,21 +27,30 @@ client.connect_signal('request::titlebars', function(c)
 		onClick = function()
 			command.perform('client:minimize', {extras = {c}})
 		end,
-		size = buttonSize
+		size = buttonSize,
+		style = {
+			bg = beautiful.titlebarBackground
+		}
 	}
 	local maximize = button {
 		icon = 'expand-less',
 		onClick = function()
 			command.perform('client:maximize', {extras = {c}})
 		end,
-		size = buttonSize
+		size = buttonSize,
+		style = {
+			bg = beautiful.titlebarBackground
+		}
 	}
 	local close = button {
 		icon = 'close',
 		onClick = function()
 			command.perform('client:close', {extras = {c}})
 		end,
-		size = buttonSize
+		size = buttonSize,
+		style = {
+			bg = beautiful.titlebarBackground
+		}
 	}
 
 	local spacing = util.dpi(4)

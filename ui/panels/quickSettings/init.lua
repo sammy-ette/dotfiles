@@ -170,13 +170,14 @@ local function createToggler(args)
 		icon = togglerInitOptions.icon,
 		iconSize = util.dpi(32),
 		color = beautiful.background,
-		shape = gears.shape.rectangle,
+		radius = beautiful.radius * 2,
 		containerHeight = util.dpi(100),
 		size = util.dpi(28),
-		click = quickSettingsModule.toggle,
+		--click = quickSettingsModule.toggle,
 		type = 'toggle',
 		style = {
-			bg = beautiful.backgroundTertiary
+			bg = beautiful.backgroundTertiary,
+			active = beautiful.accent
 		},
 		menuClick = function()
 			quickSettingsLayout:set(2, quickSettingsPage)
@@ -185,13 +186,17 @@ local function createToggler(args)
 			animator.target = quickSettingsWidth
 		end
 	}
-	local function setTogglerBackground(on)
-		toggleButton.style = {
-			bg = on and beautiful.accent or beautiful.backgroundTertiary
-		}
+	local function setTogglerState(on)
+		--toggleButton.state = on
+		--toggleButton:set_state(on)
+		toggleButton.set_state(toggleButton, on)
+		print(toggleButton.set_state, ' so its a damn function')
+		-- toggleButton.style = {
+		-- 	bg = on and beautiful.accent or beautiful.backgroundTertiary
+		-- }
 		--toggleButton.color = on and beautiful.background or beautiful.foregroundSecondary
 	end
-	setTogglerBackground(togglerInitOptions.on)
+	setTogglerState(togglerInitOptions.on)
 
 	local togglerWidget = wibox.widget {
 		layout = wibox.layout.fixed.vertical,
@@ -209,7 +214,7 @@ local function createToggler(args)
 	toggles:add(togglerWidget)
 
 	quickSettingsModule:connect_signal('toggle', function(_, on)
-		setTogglerBackground(on)
+		setTogglerState(on)
 	end)
 end
 

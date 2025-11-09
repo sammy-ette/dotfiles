@@ -25,23 +25,40 @@ function button:get_type(typ)
 	return self._private.type
 end
 
-function button:set_style(style)
-	self._private.style = style
-	self._private.widgets.background.bg = style.bg
+function button:set_colors(colors)
+	self._private.colors = colors
+	self._private.widgets.background.bg = colors.bg
+end
+
+function button:get_colors()
+	return self._private.colors
 end
 
 function button:activate()
-	self._private.click()
+	if self._private.click then
+		self._private.click(self._private.state)
+	end
 	self._private.state = not self._private.state
 
-	if self._private.type == 'normal' then return end
+	self:colorize()
+end
+
+function button:set_state(state)
+	print 'state called, but button'
+	print(state)
+	self._private.state = state
+	self:colorize()
+end
+
+function button:colorize()
 	if self._private.type == 'toggle' then
 		if self.animator then
 			self.animator.target = self._private.state and beautiful.radius or 32
 		end
-		self._private.widgets.background.bg = self._private.state and self._private.style.active or self._private.style.bg
+		self._private.widgets.background.bg = self._private.state and self._private.colors.active or self._private.colors.bg
 	end
 end
+
 
 local function new(args)
 	args = args or {}
@@ -60,7 +77,7 @@ local function new(args)
 		{
 
 			layout = background,
-			shape = args.shape or util.rrect(32),
+			shape = (args.shape or util.rrect)(args.radius or 32),
 			{
 				layout = wibox.container.place,
 				ico
@@ -76,8 +93,8 @@ local function new(args)
 
 	ret.click = args.click or args.onClick
 	ret.type = args.type or 'normal'
-	ret.style = args.style or {
-		bg = '#00000000',
+	ret.colors = args.style or {
+		bg = beautiful.background,
 		active = beautiful.accent
 	}
 	ret.buttons = {
@@ -86,15 +103,15 @@ local function new(args)
 		end)
 	}
 
-	if args.type == 'toggle' and not args.shape then
+	if args.type == 'toggle' then
 		ret.animator = rubato.timed {
 			duration = 0.2,
 			rate = 120,
 			override_dt = true,
 			subscribed = function(rad)
-				ret._private.widgets.background.shape = util.rrect(rad)
+				ret._private.widgets.background.shape = (args.shape or util.rrect)(rad)
 			end,
-			pos = 32
+			pos = args.radius or 32
 		}
 	end
 
