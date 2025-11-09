@@ -31,6 +31,9 @@ return function(screen)
 				else
 					command.perform('client:focus', {extras = {c}})
 				end
+			end),
+			awful.button({}, 2, function (c)
+				c:kill()
 			end)
 		),
 		layout = {
