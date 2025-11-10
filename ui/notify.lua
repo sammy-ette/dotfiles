@@ -10,6 +10,7 @@ local rubato = require 'libs.rubato'
 local sound = require 'sys.sound'
 local util = require 'sys.util'
 local textbox = require 'ui.widget.textbox'
+local button = require 'ui.widget.button'
 
 local categoryMappings = {
 	['drive-removable-media'] = 'usb',
@@ -184,14 +185,15 @@ naughty.connect_signal('request::display', function(notification)
 
 	local notifActions = wibox.layout.fixed.horizontal()
 	notifActions.spacing = util.dpi(8)
-	--[[
 	for _, action in ipairs(notification.actions) do
-		local btn = w.button {
+		local btn = button {
 			text = action.name,
-			bg = beautiful.xcolor10,
+			style = {
+				bg = beautiful.backgroundTertiary
+			},
 			font = beautiful.fontName .. ' Medium 12',
 			shiftFactor = -25,
-			onClick = function()
+			click = function()
 				action:invoke(notification)
 			end,
 			margin = util.dpi(4),
@@ -200,7 +202,6 @@ naughty.connect_signal('request::display', function(notification)
 
 		notifActions:add(btn)
 	end
-	]]--
 
 	local fullscreenClient = false
 	for _, c in ipairs(awful.screen.focused().selected_tag:clients()) do

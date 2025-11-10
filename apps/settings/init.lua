@@ -59,6 +59,7 @@ awesome.connect_signal('page::update', function()
 end)
 local sideAmnt = 0.25
 root:adjust_ratio(1, 0, sideAmnt, 1 - sideAmnt)
+page.switch('Theme')
 
 local box = wibox {
 	width = 683,

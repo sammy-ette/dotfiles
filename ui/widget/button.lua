@@ -6,6 +6,7 @@ local wibox = require 'wibox'
 local rubato = require 'libs.rubato'
 
 local icon = require 'ui.widget.icon'
+local textbox = require 'ui.widget.textbox'
 
 local button = {mt = {}}
 
@@ -64,26 +65,61 @@ local function new(args)
 	args = args or {}
 	local ico = icon {
 		icon = args.icon or 'fedora',
-		size = args.iconSize
+		size = args.iconSize or 24
 	}
 
 	local background = wibox.container.background()
 
-	local ret = wibox.widget {
-		layout = wibox.container.constraint,
-		width = args.size or args.width,
-		height = args.size or args.height,
-		strategy = 'exact',
-		{
-
-			layout = background,
-			shape = (args.shape or util.rrect)(args.radius or 32),
+	local ret
+	if args.expand then
+		ret = wibox.widget {
+			layout = wibox.container.constraint,
+			width = args.size or args.width,
+			height = args.size or args.height,
+			strategy = 'exact',
 			{
-				layout = wibox.container.place,
-				ico
+				layout = background,
+				shape = (args.shape or util.rrect)(args.radius or 32),
+				{
+					layout = wibox.container.place,
+					ico
+				}
 			}
 		}
-	}
+	else
+		ret = wibox.widget {
+			layout = wibox.layout.align.horizontal,
+			expand = 'none',
+			{
+				layout = background,
+				shape = (args.shape or util.rrect)(args.radius or 32),
+				{
+					layout = wibox.container.margin,
+					margins = args.margin or util.dpi(8),
+					{
+
+						layout = wibox.layout.fixed.horizontal,
+						spacing = util.dpi(4),
+						args.icon and {
+							layout = wibox.container.constraint,
+							width = args.size or args.width,
+							height = args.size or args.height,
+							strategy = 'exact',
+							{
+								layout = wibox.container.place,
+								ico
+							}
+						} or nil,
+						args.text and {
+							widget = textbox,
+							text = args.text,
+							font = args.font or beautiful.font,
+						} or nil
+					}
+				}
+			}
+		}
+	end
 
 	gears.table.crush(ret, button)
 	ret._private.widgets = {
@@ -94,7 +130,7 @@ local function new(args)
 	ret.click = args.click or args.onClick
 	ret.type = args.type or 'normal'
 	ret.colors = args.style or {
-		bg = beautiful.background,
+		bg = beautiful.shade4,
 		active = beautiful.accent
 	}
 	ret.buttons = {
