@@ -53,6 +53,7 @@ settings.defineType('quickSettings', {
 })
 
 require 'sys.theme'
+require 'sys.keys'
 
 if not awesome.__isPaperbushApp then
 	require 'sys.boot'
@@ -68,7 +69,6 @@ if not awesome.__isPaperbushApp then
 	else
 		compositor.off()
 	end
-	require 'sys.keys'
 	require 'sys.layout'
 	require 'sys.client'
 	require 'sys.autostart'
