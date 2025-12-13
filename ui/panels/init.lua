@@ -60,7 +60,20 @@ function M.create(args)
 	function panel:resize()
 		if args.height == 'screen' then
 			local scr = awful.screen.focused()
-			panel.height = scr.geometry.height - (beautiful.useless_gap * 2) - accumBars 'top' - accumBars 'bottom'
+			if args.fullscreen then
+				panel.height = scr.geometry.height
+			else
+				panel.height = scr.geometry.height - (beautiful.useless_gap * 2) - accumBars 'top' - accumBars 'bottom'
+			end
+		end
+
+		if args.width == 'screen' then
+			local scr = awful.screen.focused()
+			if args.fullscreen then
+				panel.width = scr.geometry.width
+			else
+				panel.width = scr.geometry.width - (beautiful.useless_gap * 2) - accumBars 'left' - accumBars 'right'
+			end
 		end
 	end
 
@@ -117,8 +130,8 @@ function M.create(args)
 				top = beautiful.useless_gap + accumBars 'top',
 				bottom = beautiful.useless_gap + accumBars 'bottom'
 			},
-			--honor_workarea = true,
-			--honor_padding = true
+			-- honor_workarea = true,
+			-- honor_padding = true
 		})
 		panel.alignment = alignment
 

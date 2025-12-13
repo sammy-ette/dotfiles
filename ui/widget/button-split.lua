@@ -43,7 +43,8 @@ local function new(args)
 					bl = true
 				}, rad)
 			end
-		end
+		end,
+		expand = true
 	}
 
 	local arrowBtn = button {

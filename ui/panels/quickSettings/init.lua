@@ -173,7 +173,7 @@ local function createToggler(args)
 		radius = beautiful.radius * 2,
 		containerHeight = util.dpi(100),
 		size = util.dpi(28),
-		--click = quickSettingsModule.toggle,
+		click = quickSettingsModule.toggle,
 		type = 'toggle',
 		style = {
 			bg = beautiful.backgroundTertiary,
@@ -184,7 +184,8 @@ local function createToggler(args)
 			quickSettingsLayout:emit_signal 'widget::layout_changed'
 			quickSettingsPage.visible = true
 			animator.target = quickSettingsWidth
-		end
+		end,
+		expand = true
 	}
 	local function setTogglerState(on)
 		--toggleButton.state = on

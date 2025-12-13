@@ -1,5 +1,6 @@
 local awful = require 'awful'
 local command = require 'sys.command'
+local lockscreen = require 'ui.lockscreen'
 
 local brightness = require 'sys.brightness'
 
@@ -32,4 +33,9 @@ command.add {
 command.add {
 	name = 'screen:decrease-brightness',
 	action = brightness.down
+}
+
+command.add {
+	name = 'screen:lock',
+	action = lockscreen.lock
 }
