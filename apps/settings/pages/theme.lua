@@ -54,9 +54,9 @@ page.add {
 									awful.spawn.easy_async(string.format([[ awesome-client "
 										local settings = require 'sys.settings'
 										local wallpaper = settings.getConfig 'wallpaper'
-										wallpaper.home.image = out
+										wallpaper.home.image = '%s'
 										for s in screen do
-											--s:emit_signal 'request::wallpaper'
+											s:emit_signal 'request::wallpaper'
 										end
 									"]], out), function() 
 									end)

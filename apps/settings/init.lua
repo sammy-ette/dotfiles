@@ -1,3 +1,4 @@
+local awful = require 'awful'
 local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
@@ -61,9 +62,11 @@ local sideAmnt = 0.25
 root:adjust_ratio(1, 0, sideAmnt, 1 - sideAmnt)
 page.switch('Theme')
 
+local scr = awful.screen.focused()
+
 local box = wibox {
-	width = 683,
-	height = 384,
+	width = scr.geometry.width * 0.8,
+	height = scr.geometry.height * 0.8,
 	bg = beautiful.background,
 	widget = {
 		widget = wibox.container.margin,
