@@ -1,9 +1,9 @@
 [submodule "wallpapers"]
 	path = wallpapers
-	url = https://github.com/TorchedSammy/walls
+	url = https://github.com/sammy-ette/walls
 [submodule "libs/extrautils"]
 	path = libs/extrautils
-	url = https://github.com/ReadyWidgets/awesome-extrautils
+	url = https://github.com/sammy-ette/awesome-extrautils
 [submodule "libs/rubato"]
 	path = libs/rubato
 	url = https://github.com/andOrlando/rubato
