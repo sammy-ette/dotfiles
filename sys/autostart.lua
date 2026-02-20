@@ -32,7 +32,7 @@ awesome.connect_signal('paperbush::initialized', function(first)
 		end)
 	end
 
-	awful.spawn.easy_async('dex-autostart --environment Awesome --autostart', function() end)
+	awful.spawn.easy_async('dex-autostart --environment MATE --autostart', function() end)
 	sound.play 'startup'
 end)
 
