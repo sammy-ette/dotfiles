@@ -21,4 +21,12 @@ function M.togglePlay()
 	playerctl:play_pause()
 end
 
+function M.next()
+	playerctl:next()
+end
+
+function M.previous()
+	playerctl:previous()
+end
+
 return M

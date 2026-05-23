@@ -53,6 +53,21 @@ local keyTable = {
 		action = 'audio:increase-volume'
 	},
 	{
+		group = 'audio',
+		key = 'XF86AudioPlay',
+		action = 'audio:toggle-play'
+	},
+	{
+		group = 'audio',
+		key = 'XF86AudioNext',
+		action = 'audio:next'
+	},
+	{
+		group = 'audio',
+		key = 'XF86AudioPrev',
+		action = 'audio:previous'
+	},
+	{
 		group = 'management',
 		key = 'M-Left',
 		action = 'client:focus-left'
