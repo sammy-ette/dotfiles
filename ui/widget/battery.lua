@@ -17,6 +17,8 @@ local icon = require 'ui.widget.icon'
 local bat = {mt = {}}
 
 local function new(opts)
+	if battery.status() == 'None' then return widget.base.empty_widget() end
+
 	local background = icon {icon = 'battery', size = opts.size, color = beautiful.foregroundSecondary}
 	local indicator = widget {
 		widget = imagebox,
@@ -94,8 +96,6 @@ local function new(opts)
 	end
 	handleBattery()
 	awesome.connect_signal('battery::percentage', handleBattery)
-
-	if battery.status() == 'None' then return nil end
 
 	return wid
 end
