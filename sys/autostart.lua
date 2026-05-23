@@ -1,6 +1,5 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
-local compositor = require 'sys.compositor'
 local settings = require 'sys.settings'
 local naughty = require 'naughty'
 local sound = require 'sys.sound'
@@ -35,4 +34,3 @@ awesome.connect_signal('paperbush::initialized', function(first)
 	awful.spawn.easy_async('dex-autostart --environment Awesome --autostart', function() end)
 	sound.play 'startup'
 end)
-
